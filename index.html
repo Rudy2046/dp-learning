@@ -137,7 +137,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var
 </div>
 
 <div class="hero">
-  <div class="hero-badge">GESP六级 · 29章 · 七大模块</div>
+  <div class="hero-badge">信息学CSP · GESP · 29章 · 七大模块</div>
   <h1>从递推到树形，<em>逐关击破</em>动态规划</h1>
   <p>每章三个难度关卡（新兵·锐士·英雄），循序渐进解锁，完成前置章节自动开放下一关。</p>
   <div class="hero-kpis" id="hero-kpis">
@@ -306,7 +306,13 @@ function render(){
           <div class="cc-stars">${stars}</div>
           <span class="cc-rank">${coming?'待开发':dr+'/3'}</span>
         </div>
-        <button class="cc-btn ${bcls}" onclick="event.stopPropagation();go('${id}',${ok&&!coming})">${btxt}</button>`;
+        <div style="display:flex;gap:5px;margin-top:2px">
+          <button class="cc-btn ${bcls}" style="flex:1"
+            onclick="event.stopPropagation();go('${id}',${ok&&!coming})">${btxt}</button>
+          ${ok&&!coming?`<button class="cc-btn" title="复制章节链接"
+            style="width:32px;flex-shrink:0;background:var(--bg3);color:var(--text2);border:1px solid var(--border);padding:0"
+            onclick="event.stopPropagation();copyLink('${id}')">🔗</button>`:''}
+        </div>`;
 
       if(ok&&!coming) card.addEventListener('click',()=>go(id,true));
       grid.appendChild(card);
@@ -315,6 +321,22 @@ function render(){
 }
 
 function go(id,ok){if(!ok)return;location.href='lesson.html?id='+id;}
+
+function copyLink(id){
+  const base=location.href.replace(/index\.html.*$/,'');
+  const url=base+'lesson.html?id='+id;
+  navigator.clipboard.writeText(url).then(()=>{
+    const t=document.createElement('div');
+    t.textContent='🔗 链接已复制 ✓';
+    t.style.cssText='position:fixed;bottom:28px;left:50%;transform:translateX(-50%) scale(.9);background:#1a2240;color:#fff;padding:9px 22px;border-radius:22px;font-size:13px;font-weight:500;z-index:9999;opacity:0;transition:all .2s;pointer-events:none;font-family:var(--font)';
+    document.body.appendChild(t);
+    requestAnimationFrame(()=>{t.style.opacity='1';t.style.transform='translateX(-50%) scale(1)';});
+    setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),200);},2000);
+  }).catch(()=>{
+    prompt('复制此链接：',url);
+  });
+}
+
 function doReset(){
   if(confirm('确认重置所有学习进度？金币、星级、通关记录将全部清零。')){
     localStorage.removeItem(KEY);render();
