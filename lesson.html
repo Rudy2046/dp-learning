@@ -234,6 +234,42 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);display:flex
 .loading-bar{width:200px;height:3px;background:var(--bg4);border-radius:2px;overflow:hidden}
 .loading-bar-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--blue));animation:lp .9s ease forwards}
 @keyframes lp{0%{width:0%}100%{width:100%}}
+
+/* DP 填表可视化组件 */
+.viz-wrap{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:14px;margin-bottom:14px}
+.viz-cap-lbl{font-size:10px;font-weight:700;color:var(--teal);letter-spacing:.07em;text-transform:uppercase;margin-bottom:12px}
+.viz-grid-scroll{overflow-x:auto;padding-bottom:4px}
+.viz-grid{border-collapse:separate;border-spacing:5px;margin:0 auto}
+.viz-grid td{padding:0}
+.viz-cell{width:46px;height:40px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;font-family:var(--mono);border:1.5px solid var(--border);background:var(--bg);color:var(--text3);transition:all .25s;position:relative}
+.viz-cell.void{visibility:hidden}
+.viz-cell.filled{background:var(--bg4);color:var(--text);border-color:var(--border2);cursor:pointer}
+.viz-cell.dep{border-color:var(--blue);background:var(--blue-glow);color:#bcd3ff;box-shadow:0 0 0 2px var(--blue-glow)}
+.viz-cell.active{border-color:var(--gold);background:var(--gold-glow);color:var(--gold);box-shadow:0 0 12px var(--gold-glow);transform:scale(1.07);z-index:2}
+.viz-rowlbl,.viz-collbl{font-size:10px;color:var(--text3);font-family:var(--mono);text-align:center;font-weight:500;min-width:28px}
+.viz-caption{margin-top:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:11px 14px;min-height:56px}
+.viz-expr{font-family:var(--mono);font-size:13px;color:var(--gold);line-height:1.7;white-space:pre-wrap}
+.viz-note{font-size:12px;color:var(--text2);margin-top:5px;line-height:1.6}
+.viz-controls{display:flex;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap}
+.viz-btn{background:var(--bg4);border:1px solid var(--border);color:var(--text2);border-radius:7px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s}
+.viz-btn:hover:not(:disabled){border-color:var(--blue);color:var(--blue)}
+.viz-btn:disabled{opacity:.4;cursor:not-allowed}
+.viz-btn.play{background:var(--blue);color:#fff;border-color:var(--blue)}
+.viz-btn.play:hover:not(:disabled){background:var(--blue2)}
+.viz-speed{background:var(--bg4);border:1px solid var(--border);color:var(--text2);border-radius:7px;padding:6px 8px;font-size:11px;font-family:var(--font);cursor:pointer}
+.viz-progress{flex:1;min-width:70px;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden}
+.viz-progress-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--blue));width:0;transition:width .25s}
+.viz-step-txt{font-size:11px;color:var(--text3);font-family:var(--mono);white-space:nowrap}
+.viz-legend{display:flex;gap:14px;margin-top:11px;flex-wrap:wrap}
+.viz-leg{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3)}
+.viz-leg-box{width:13px;height:13px;border-radius:4px;border:1.5px solid var(--border);flex-shrink:0}
+
+/* 游戏化特效 */
+.tb-sound{background:none;border:1px solid var(--border);color:var(--text2);width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .15s;padding:0;font-family:var(--font)}
+.tb-sound:hover{border-color:var(--blue);color:var(--text)}
+.tb-sound.off{opacity:.55}
+@keyframes fxShake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-7px)}40%,60%{transform:translateX(7px)}}
+.fx-shake{animation:fxShake .4s cubic-bezier(.36,.07,.19,.97)}
 </style>
 </head>
 <body>
@@ -257,6 +293,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);display:flex
       <span id="xp-text">0</span>
       <div class="xp-bar"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
     </div>
+    <button class="tb-sound" id="tb-sound" title="音效开关">🔊</button>
     <div class="tb-coins"><div class="coin-gem"></div><span id="total-coins">0</span></div>
   </div>
 </div>
@@ -519,6 +556,251 @@ init();
 // STATE
 let S={coins:0,done:{},cur:null,step:0,answers:{},filled:{},selBlank:null,chosen:undefined,wrongs:0,timerSec:1500,timerInt:null};
 
+// ═══════════════════════════════════════════════════════════════
+// DP 填表动态可视化组件（数据驱动，可复用）
+//   在某关 steps[] 里加一条：
+//   { type:'viz', lbl:'看填表', title:'...', body:'可选引言',
+//     viz:{ caption:'...', rows:R, cols:C,
+//           rowLabels:[...], colLabels:[...],   // 可选
+//           intro:'可选首屏提示',
+//           cells:[                              // 按填表顺序排列
+//             {r,c,val, from:[[r2,c2],...], expr:'dp[..]=..', note:'可选'}, ...
+//           ] } }
+//   未在 cells 出现的 (r,c) 会渲染成空白（自动支持三角形等非满矩形）。
+// ═══════════════════════════════════════════════════════════════
+let VIZ=null;
+const VK=(r,c)=>r+'_'+c;
+
+function vizBuildHTML(viz){
+  return `
+  <div class="viz-wrap">
+    <div class="viz-cap-lbl">🎬 ${viz.caption||'DP 填表过程演示'}</div>
+    <div class="viz-grid-scroll"><div id="viz-grid-host"></div></div>
+    <div class="viz-caption" id="viz-caption"></div>
+    <div class="viz-controls">
+      <button class="viz-btn play" id="viz-play">▶ 播放</button>
+      <button class="viz-btn" id="viz-prev">◀ 上一步</button>
+      <button class="viz-btn" id="viz-next">下一步 ▶</button>
+      <button class="viz-btn" id="viz-reset">↺ 重置</button>
+      <select class="viz-speed" id="viz-speed">
+        <option value="1400">0.5×</option>
+        <option value="900" selected>1×</option>
+        <option value="500">2×</option>
+        <option value="250">4×</option>
+      </select>
+      <div class="viz-progress"><div class="viz-progress-fill" id="viz-progress-fill"></div></div>
+      <span class="viz-step-txt" id="viz-step-txt">0 / 0</span>
+    </div>
+    <div class="viz-legend">
+      <div class="viz-leg"><span class="viz-leg-box" style="border-color:var(--gold);background:var(--gold-glow)"></span>当前格</div>
+      <div class="viz-leg"><span class="viz-leg-box" style="border-color:var(--blue);background:var(--blue-glow)"></span>转移来源</div>
+      <div class="viz-leg"><span class="viz-leg-box" style="background:var(--bg4);border-color:var(--border2)"></span>已填（点击回看来源）</div>
+    </div>
+  </div>`;
+}
+
+function mountViz(viz){
+  if(VIZ&&VIZ.timer)clearInterval(VIZ.timer);
+  VIZ={viz,frame:0,playing:false,timer:null,speed:900,inspect:null};
+  const sp=document.getElementById('viz-speed');if(sp)VIZ.speed=+sp.value;
+  document.getElementById('viz-play').onclick=vizTogglePlay;
+  document.getElementById('viz-next').onclick=()=>vizStep(1);
+  document.getElementById('viz-prev').onclick=()=>vizStep(-1);
+  document.getElementById('viz-reset').onclick=vizReset;
+  document.getElementById('viz-speed').onchange=function(){VIZ.speed=+this.value;if(VIZ.playing){vizPause();vizPlay();}};
+  vizRender();
+}
+
+function vizActiveIdx(){
+  if(VIZ.inspect!=null)return VIZ.inspect;
+  return VIZ.frame>=1?VIZ.frame-1:-1;
+}
+
+function vizRender(){
+  const {viz,frame}=VIZ;
+  const cells=viz.cells;const n=cells.length;
+  let rows=viz.rows,cols=viz.cols;
+  if(!rows||!cols){let mr=0,mc=0;cells.forEach(c=>{mr=Math.max(mr,c.r);mc=Math.max(mc,c.c);});rows=rows||mr+1;cols=cols||mc+1;}
+  const map={};cells.forEach((c,i)=>{map[VK(c.r,c.c)]={idx:i,cell:c};});
+  const ai=vizActiveIdx();
+  const act=ai>=0?cells[ai]:null;
+  const dep=new Set((act&&act.from?act.from:[]).map(([r,c])=>VK(r,c)));
+
+  let h='<table class="viz-grid"><tbody>';
+  if(viz.colLabels){
+    h+='<tr>'+(viz.rowLabels?'<td></td>':'');
+    for(let c=0;c<cols;c++)h+=`<td class="viz-collbl">${viz.colLabels[c]??c}</td>`;
+    h+='</tr>';
+  }
+  for(let r=0;r<rows;r++){
+    h+='<tr>';
+    if(viz.rowLabels)h+=`<td class="viz-rowlbl">${viz.rowLabels[r]??r}</td>`;
+    for(let c=0;c<cols;c++){
+      const m=map[VK(r,c)];
+      if(!m){h+='<td><div class="viz-cell void"></div></td>';continue;}
+      const revealed=m.idx<frame;
+      let cls='viz-cell';
+      if(revealed)cls+=' filled';
+      if(revealed&&dep.has(VK(r,c)))cls+=' dep';
+      if(ai===m.idx&&revealed)cls+=' active';
+      h+=`<td><div class="${cls}" data-idx="${m.idx}">${revealed?m.cell.val:''}</div></td>`;
+    }
+    h+='</tr>';
+  }
+  h+='</tbody></table>';
+  document.getElementById('viz-grid-host').innerHTML=h;
+
+  let cap;
+  if(act&&ai<frame){
+    cap=`<div class="viz-expr">${act.expr||''}</div>`+(act.note?`<div class="viz-note">${act.note}</div>`:'');
+  }else{
+    cap=`<div class="viz-note">${viz.intro||'点击 ▶ 播放，观察 dp 表如何从边界条件逐格递推填满；点任意已填格子可回看它由哪些格子转移而来。'}</div>`;
+  }
+  document.getElementById('viz-caption').innerHTML=cap;
+
+  document.getElementById('viz-progress-fill').style.width=Math.round(frame/n*100)+'%';
+  document.getElementById('viz-step-txt').textContent=frame+' / '+n;
+  document.getElementById('viz-prev').disabled=(frame<=0&&VIZ.inspect==null);
+  document.getElementById('viz-next').disabled=frame>=n;
+  document.getElementById('viz-play').textContent=VIZ.playing?'⏸ 暂停':(frame>=n?'↺ 重放':'▶ 播放');
+
+  document.getElementById('viz-grid-host').querySelectorAll('.viz-cell.filled').forEach(el=>{
+    el.onclick=()=>{const i=+el.dataset.idx;vizPause();VIZ.inspect=(VIZ.inspect===i?null:i);vizRender();};
+  });
+}
+
+function vizStep(d){VIZ.inspect=null;VIZ.frame=Math.max(0,Math.min(VIZ.viz.cells.length,VIZ.frame+d));vizRender();}
+function vizReset(){vizPause();VIZ.inspect=null;VIZ.frame=0;vizRender();}
+function vizPause(){VIZ.playing=false;if(VIZ.timer){clearInterval(VIZ.timer);VIZ.timer=null;}}
+function vizPlay(){
+  if(VIZ.frame>=VIZ.viz.cells.length)VIZ.frame=0;
+  VIZ.inspect=null;VIZ.playing=true;
+  VIZ.timer=setInterval(()=>{
+    if(VIZ.frame>=VIZ.viz.cells.length){vizPause();vizRender();return;}
+    VIZ.frame++;vizRender();
+  },VIZ.speed);
+  vizRender();
+}
+function vizTogglePlay(){if(VIZ.playing){vizPause();vizRender();}else{vizPlay();}}
+
+// ═══════════════════════════════════════════════════════════════
+// 游戏化特效（自包含：Web Audio 合成音效 + Canvas 粒子 + 四级反馈）
+//   外部只需调用 FX.correct() / FX.wrong() / FX.levelClear() / FX.perfectClear()
+//   无外部依赖、无音频文件、无 CDN；尊重 prefers-reduced-motion；低端机自动减粒子。
+// ═══════════════════════════════════════════════════════════════
+const FX=(()=>{
+  const reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const lowEnd = (navigator.hardwareConcurrency||4) <= 4;   // 粗判低端机
+  const CAP    = reduce ? 0 : (lowEnd ? 70 : 150);          // 粒子总量上限
+
+  // ── 音效开关（持久化）──
+  let soundOn = (localStorage.getItem('dpquest_sound')!=='off');
+  const setSound=on=>{soundOn=on;try{localStorage.setItem('dpquest_sound',on?'on':'off');}catch(e){}};
+  const isSoundOn=()=>soundOn;
+
+  // ── Web Audio 合成 ──
+  let ac=null;
+  function ctx(){
+    if(!ac){try{ac=new (window.AudioContext||window.webkitAudioContext)();}catch(e){return null;}}
+    if(ac.state==='suspended')ac.resume();
+    return ac;
+  }
+  function tone(freq,dur,type='sine',vol=0.18,delay=0){
+    if(!soundOn)return;
+    const c=ctx();if(!c)return;
+    const t=c.currentTime+delay;
+    const o=c.createOscillator(),g=c.createGain();
+    o.type=type;o.frequency.setValueAtTime(freq,t);
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.linearRampToValueAtTime(vol,t+0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    o.connect(g).connect(c.destination);
+    o.start(t);o.stop(t+dur+0.03);
+  }
+  const SND={
+    correct(){tone(880,0.12,'triangle',0.16);tone(1320,0.16,'triangle',0.14,0.07);},
+    wrong(){tone(180,0.18,'sawtooth',0.12);tone(150,0.20,'sawtooth',0.10,0.04);},
+    levelClear(){[[523,.18,0],[659,.18,.12],[784,.28,.24]].forEach(([f,d,dl])=>tone(f,d,'triangle',0.15,dl));},
+    perfectClear(){[[523,.16,0],[659,.16,.11],[784,.16,.22],[1046,.40,.34]].forEach(([f,d,dl])=>tone(f,d,'triangle',0.17,dl));tone(1568,0.5,'sine',0.09,0.40);},
+  };
+
+  // ── Canvas 粒子 ──
+  let cv=null,g=null,parts=[],raf=null;
+  function ensureCanvas(){
+    if(cv)return;
+    cv=document.createElement('canvas');
+    cv.style.cssText='position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9999';
+    document.body.appendChild(cv);
+    g=cv.getContext('2d');resize();window.addEventListener('resize',resize);
+  }
+  function resize(){if(!cv)return;const d=window.devicePixelRatio||1;cv.width=innerWidth*d;cv.height=innerHeight*d;if(g)g.setTransform(d,0,0,d,0,0);}
+  function star(s,color){
+    g.fillStyle=color;g.beginPath();
+    for(let i=0;i<10;i++){const r=(i%2===0)?s:s*0.45;const a=(Math.PI/5)*i-Math.PI/2;g[i===0?'moveTo':'lineTo'](Math.cos(a)*r,Math.sin(a)*r);}
+    g.closePath();g.fill();
+  }
+  function tick(){
+    raf=requestAnimationFrame(tick);
+    g.clearRect(0,0,innerWidth,innerHeight);
+    for(let i=parts.length-1;i>=0;i--){
+      const p=parts[i];
+      p.vy+=p.g;p.x+=p.vx;p.y+=p.vy;p.life--;p.rot+=p.vr;
+      g.save();g.globalAlpha=Math.max(0,p.life/p.life0);g.translate(p.x,p.y);g.rotate(p.rot);
+      if(p.kind==='coin'){g.fillStyle=p.c;g.beginPath();g.arc(0,0,p.s,0,7);g.fill();g.fillStyle='rgba(255,255,255,.55)';g.beginPath();g.arc(-p.s*0.3,-p.s*0.3,p.s*0.32,0,7);g.fill();}
+      else if(p.kind==='star'){star(p.s,p.c);}
+      else{g.fillStyle=p.c;g.fillRect(-p.s/2,-p.s/2,p.s,p.s*0.6);}
+      g.restore();
+      if(p.life<=0||p.y>innerHeight+50)parts.splice(i,1);
+    }
+    if(parts.length===0){cancelAnimationFrame(raf);raf=null;}
+  }
+  function spawn(arr){
+    if(reduce||CAP===0)return;
+    ensureCanvas();
+    for(const p of arr){p.life0=p.life;parts.push(p);}
+    if(parts.length>CAP)parts.splice(0,parts.length-CAP);
+    if(!raf)tick();
+  }
+  function coinBurst(x,y,n=16){
+    const cs=['#f5b942','#ffd27a','#e0a030'],arr=[];
+    for(let i=0;i<n;i++){const a=Math.random()*6.28,sp=2+Math.random()*5;
+      arr.push({kind:'coin',x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-3,g:0.18,s:4+Math.random()*4,c:cs[i%3],life:50+Math.random()*25,rot:0,vr:(Math.random()-.5)*.3});}
+    spawn(arr);
+  }
+  function confetti(n=70){
+    const cs=['#4c7ef5','#1ec97a','#f5b942','#9b72ef','#22d4c0','#ef4f60'],arr=[];
+    for(let i=0;i<n;i++)arr.push({kind:'confetti',x:Math.random()*innerWidth,y:-20-Math.random()*60,vx:(Math.random()-.5)*3,vy:1+Math.random()*2,g:0.05,s:7+Math.random()*6,c:cs[i%cs.length],life:120+Math.random()*60,rot:Math.random()*6,vr:(Math.random()-.5)*.25});
+    spawn(arr);
+  }
+  function starShower(n=46){
+    const cs=['#f5b942','#ffd27a','#fff0c0'],arr=[];
+    for(let i=0;i<n;i++)arr.push({kind:'star',x:Math.random()*innerWidth,y:-20-Math.random()*innerHeight*0.5,vx:(Math.random()-.5)*2,vy:1.5+Math.random()*2.5,g:0.04,s:6+Math.random()*8,c:cs[i%3],life:130+Math.random()*70,rot:Math.random()*6,vr:(Math.random()-.5)*.3});
+    spawn(arr);
+  }
+  function elCenter(id){const el=document.getElementById(id);if(!el)return{x:innerWidth/2,y:innerHeight/3};const r=el.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2};}
+
+  // ── 四级反馈 ──
+  return {
+    // L1 轻：答对单步
+    correct(){SND.correct();const c=elCenter('btn-confirm');coinBurst(c.x,c.y,8);},
+    // L2 中：答错（纠正感，不惩罚）
+    wrong(){SND.wrong();if(!reduce){const m=document.querySelector('.modal');if(m){m.classList.remove('fx-shake');void m.offsetWidth;m.classList.add('fx-shake');}}},
+    // L3 强：通关
+    levelClear(){SND.levelClear();confetti();coinBurst(innerWidth/2,innerHeight*0.42,18);},
+    // L4 满：三星零失误
+    perfectClear(){SND.perfectClear();starShower();confetti(54);coinBurst(innerWidth/2,innerHeight*0.42,24);},
+    setSound,isSoundOn
+  };
+})();
+
+// 顶栏音效开关
+(function(){
+  const b=document.getElementById('tb-sound');if(!b)return;
+  const sync=()=>{b.textContent=FX.isSoundOn()?'🔊':'🔇';b.classList.toggle('off',!FX.isSoundOn());};
+  sync();
+  b.onclick=()=>{FX.setSound(!FX.isSoundOn());sync();};
+})();
+
 function tick(){
   S.timerSec--;
   const m=String(Math.floor(S.timerSec/60)).padStart(2,'0');
@@ -546,9 +828,11 @@ function openBattle(r){
 function closeModal(){
   document.getElementById('mask').classList.remove('open');
   clearInterval(S.timerInt);
+  if(VIZ&&VIZ.timer){clearInterval(VIZ.timer);VIZ.timer=null;VIZ.playing=false;}
 }
 
 function renderStep(){
+  if(VIZ&&VIZ.timer){clearInterval(VIZ.timer);VIZ.timer=null;VIZ.playing=false;}
   const b=DATA[S.cur];const steps=b.steps;const total=steps.length;const si=S.step;const step=steps[si];
 
   // Rail
@@ -624,7 +908,14 @@ function renderStep(){
     html+=`<div class="fb fb-hint" id="hint-box"></div>`;
   }
 
+  if(step.type==='viz'){
+    if(step.body)html+=`<div class="q-txt">${step.body}</div>`;
+  }
+
+  if(step.viz) html+=vizBuildHTML(step.viz);
+
   document.getElementById('q-content').innerHTML=html;
+  if(step.viz) mountViz(step.viz);
   document.getElementById('q-scroll').scrollTop=0;
   updateFoot();
 }
@@ -665,7 +956,7 @@ function updateFoot(){
   const b=DATA[S.cur];const si=S.step;const step=b.steps[si];
   const btn=document.getElementById('btn-confirm');
   const hintBtn=document.getElementById('btn-hint');
-  if(step.type==='concept'){btn.textContent='下一步 →';btn.disabled=false;hintBtn.classList.add('hidden');return;}
+  if(step.type==='concept'||step.type==='viz'){btn.textContent=si<b.steps.length-1?'下一步 →':'完成关卡 🎉';btn.disabled=false;hintBtn.classList.add('hidden');return;}
   const answered=S.answers[si]!==undefined;
   if(answered){
     btn.textContent=si<b.steps.length-1?'下一步 →':'完成关卡 🎉';
@@ -680,11 +971,13 @@ function updateFoot(){
 
 function doConfirm(){
   const b=DATA[S.cur];const si=S.step;const step=b.steps[si];
-  if(step.type==='concept'){advance();return;}
+  if(step.type==='concept'||step.type==='viz'){advance();return;}
   if(step.type==='choice'){
     if(S.answers[si]!==undefined){advance();return;}
     S.answers[si]=S.chosen;S.chosen=undefined;
-    if(S.answers[si]!==step.ans)S.wrongs++;
+    const correct=(S.answers[si]===step.ans);
+    if(!correct)S.wrongs++;
+    correct?FX.correct():FX.wrong();
     renderStep();updateFoot();return;
   }
   if(step.type==='fill'){
@@ -692,6 +985,7 @@ function doConfirm(){
     const filled=step.blanks.map((_,bi)=>S.filled[si+'-'+bi]);
     const ok=filled.every((v,i)=>v===step.answers[i]);
     S.answers[si]=ok;if(!ok)S.wrongs++;
+    ok?FX.correct():FX.wrong();
     renderStep();updateFoot();return;
   }
 }
@@ -710,36 +1004,69 @@ function showHint(){
 
 function showVictory(){
   clearInterval(S.timerInt);
+  if(VIZ&&VIZ.timer){clearInterval(VIZ.timer);VIZ.timer=null;VIZ.playing=false;}
   const b=DATA[S.cur];
   const stars=S.wrongs===0?3:S.wrongs<=2?2:1;
-  S.done[S.cur]=stars;
+
+  // ── 读取历史最好成绩，判定本次是否产生奖励 ──────────────
+  const prog = loadProgress();
+  if(!prog.done[CURRENT_ID]) prog.done[CURRENT_ID]={};
+  const prevStars = prog.done[CURRENT_ID][S.cur];          // undefined = 从未通关
+  const firstClear = (prevStars === undefined);
+  const prevBest = prevStars || 0;
+  const newBest  = Math.max(prevBest, stars);
+
+  // 金币按星级缩放（3★满额 / 2★七成 / 1★四成），且只补「比历史最好多出来的部分」→ 不可刷
+  const fullCoins = b.coins||0;
+  const mult = s => s===3?1 : s===2?0.7 : s>=1?0.4 : 0;
+  const prevCoinVal = Math.round(fullCoins*mult(prevBest));
+  const newCoinVal  = Math.round(fullCoins*mult(newBest));
+  const gainCoins = Math.max(0, newCoinVal - prevCoinVal);
+  // 经验只在首次通关结算（代表“学过这一关”），重打不再发
+  const gainXp = firstClear ? (b.xp||0) : 0;
+
+  S.coins += gainCoins;
+  S.xp    += gainXp;
+  S.done[S.cur] = newBest;                                  // 只保留历史最好星级
+  prog.coins = S.coins;
+  prog.xp    = S.xp;
+  prog.done[CURRENT_ID][S.cur] = newBest;
+  saveProgress(prog);
+
   document.getElementById('q-scroll').classList.add('hidden');
   document.getElementById('modal-foot').classList.add('hidden');
   const vp=document.getElementById('victory');
   vp.classList.remove('hidden');
 
   document.getElementById('v-title').textContent={new:'新兵关通过！',pro:'锐士关通过！',hero:'英雄关通过！'}[S.cur];
-  document.getElementById('v-sub').textContent=stars===3?'零失误！完美通关！':stars===2?'掌握了核心思路，继续加油！':'通关了，建议再练习一遍巩固。';
+  let sub;
+  if(firstClear) sub = stars===3?'零失误！完美通关！':stars===2?'掌握了核心思路，继续加油！':'通关了，建议再练习一遍巩固。';
+  else if(gainCoins>0) sub = '刷新最佳成绩！补发星级差额奖励 🎉';
+  else sub = '复习巩固完成 · 本次无额外奖励（已是最佳成绩）';
+  document.getElementById('v-sub').textContent=sub;
 
   let starsH='';
   for(let i=0;i<3;i++)starsH+=`<span class="vs ${i<stars?'lit':'dim'}" style="animation-delay:${i*.15}s">${i<stars?'★':'☆'}</span>`;
   document.getElementById('v-stars').innerHTML=starsH;
 
-  S.coins+=b.coins;
   document.getElementById('total-coins').textContent=S.coins;
   document.getElementById('v-rwds').innerHTML=`
-    <div class="v-rwd"><div class="v-rwd-val">+${b.coins}</div><div class="v-rwd-lbl">精灵币</div></div>
-    <div class="v-rwd"><div class="v-rwd-val">+${b.xp}</div><div class="v-rwd-lbl">经验值</div></div>
-    <div class="v-rwd"><div class="v-rwd-val">${stars}★</div><div class="v-rwd-lbl">评分</div></div>
+    <div class="v-rwd"><div class="v-rwd-val" style="${gainCoins?'':'color:var(--text3)'}">+${gainCoins}</div><div class="v-rwd-lbl">精灵币</div></div>
+    <div class="v-rwd"><div class="v-rwd-val" style="${gainXp?'':'color:var(--text3)'}">+${gainXp}</div><div class="v-rwd-lbl">经验值</div></div>
+    <div class="v-rwd"><div class="v-rwd-val">${stars}★</div><div class="v-rwd-lbl">本次评分</div></div>
   `;
 
-  // Update main card
+  // Update main card（按历史最好星级显示）
   document.getElementById('sc-'+S.cur).textContent='1';
   document.getElementById('pg-'+S.cur).style.width='100%';
-  let sh='';for(let i=0;i<3;i++)sh+=`<span class="star ${i<stars?'s-lit':'s-dim'}">${i<stars?'★':'☆'}</span>`;
+  let sh='';for(let i=0;i<3;i++)sh+=`<span class="star ${i<newBest?'s-lit':'s-dim'}">${i<newBest?'★':'☆'}</span>`;
   document.getElementById('stars-'+S.cur).innerHTML=sh;
   const mainBtn=document.getElementById('btn-'+S.cur);
   if(mainBtn){mainBtn.textContent='再来一次';mainBtn.className='bc-btn bb-again';}
+
+  // 顶栏经验/金币/完成数同步
+  document.getElementById('xp-text').textContent = S.xp;
+  document.getElementById('xp-fill').style.width = Math.min(100,Math.round(S.xp/2000*100))+'%';
   document.getElementById('done-count').textContent=Object.keys(S.done).length;
 
   // Unlock hero after pro
@@ -756,25 +1083,12 @@ function showVictory(){
   if(S.cur==='new'){nxt.textContent='挑战锐士 →';nxt.onclick=()=>openBattle('pro');}
   else if(S.cur==='pro'){nxt.textContent='挑战英雄 →';nxt.onclick=()=>openBattle('hero');}
   else{nxt.textContent='查看下一课时 →';nxt.onclick=closeModal;}
-}
 
-// ── 通关后保存进度 ──────────────────────────────────────────
-const __ov = showVictory;
-showVictory = function(){
-  __ov();
-  const prog = loadProgress();
-  if(!prog.done[CURRENT_ID]) prog.done[CURRENT_ID]={};
-  prog.done[CURRENT_ID][S.cur] = S.done[S.cur];
-  prog.coins = S.coins;
-  prog.xp    = (prog.xp||0)+(DATA[S.cur]?.xp||0);
-  S.xp = prog.xp;
-  saveProgress(prog);
+  // 通关特效：三星零失误 → 满级；否则普通通关
+  if(stars===3)FX.perfectClear();else FX.levelClear();
+
   renderSidebar(CURRENT_ID);
-  document.getElementById('total-coins').textContent = S.coins;
-  document.getElementById('xp-text').textContent = S.xp;
-  document.getElementById('xp-fill').style.width = Math.min(100,Math.round(S.xp/2000*100))+'%';
-  document.getElementById('done-count').textContent = Object.keys(S.done).length;
-};
+}
 
 </script>
 </body>
