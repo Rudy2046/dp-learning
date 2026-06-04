@@ -190,8 +190,8 @@ const CH={
   multi_pack:  {n:'11',t:'多重背包与二进制优化',  s:'二进制拆分降复杂度',   tags:['背包','二进制拆分'],   d:3,min:65,pre:['complete_pack']},
   group_pack:  {n:'12',t:'分组背包',             s:'组内只选一件',         tags:['背包','互斥选择'],     d:3,min:60,pre:['multi_pack']},
   pack_var:    {n:'13',t:'背包模型多元变形',      s:'方案数·恰好凑齐',     tags:['背包','变形应用'],     d:3,min:65,pre:['group_pack']},
-  interval_basic:{n:'14',t:'区间 DP 入门',       s:'石子合并（链状）',     tags:['区间DP','枚举断点'],   d:3,min:65,pre:['lcs'],coming:1},
-  interval_circle:{n:'15',t:'环形区间 DP',       s:'断环为链',             tags:['区间DP','环形'],       d:3,min:65,pre:['interval_basic'},
+  interval_basic:{n:'14',t:'区间 DP 入门',       s:'石子合并（链状）',     tags:['区间DP','枚举断点'],   d:3,min:65,pre:['pack_var']},
+  interval_circle:{n:'15',t:'环形区间 DP',       s:'断环为链',             tags:['区间DP','环形'],       d:3,min:65,pre:['interval_basic'],
   interval_palindrome:{n:'16',t:'回文型区间 DP', s:'最长回文子序列',       tags:['区间DP','回文'],       d:3,min:60,pre:['interval_circle']},
   interval_score:{n:'17',t:'区间 DP 得分变形',   s:'能量项链·矩阵连乘',   tags:['区间DP','综合'],       d:3,min:70,pre:['interval_palindrome']},
   tree_basic:  {n:'18',t:'树形 DP 基础',         s:'没有上司的舞会',       tags:['树形DP','DFS'],        d:3,min:65,pre:['lcs']},
@@ -211,15 +211,36 @@ const CH={
 const KEY='dpquest_v1';
 const lp=()=>{try{return JSON.parse(localStorage.getItem(KEY))||{coins:0,xp:0,done:{}};}catch{return{coins:0,xp:0,done:{}};}};
 
-function unlocked(id,p){
-  const c=CH[id]; if(!c||c.coming)return false;
+function unlocked(id,p,readySet){
+  const c=CH[id]; if(!c||!readySet.has(id))return false;
   return !c.pre.length||c.pre.every(x=>p.done[x]&&Object.keys(p.done[x]).length>0);
 }
 function getStars(id,p){
   return p.done[id]?Object.values(p.done[id]).reduce((a,v)=>a+(v||0),0):0;
 }
 
-function render(){
+async function render(){
+  // 自动探测 data/ 目录下哪些章节文件存在，无需手动维护清单
+  const FILE_MAP={
+    fib:'01_fib',triangle:'02_triangle',
+    grid_dp:'03_grid_dp',linear_dp:'04_linear_dp',maxsubarray:'05_maxsubarray',
+    lis:'06_lis',lcs:'07_lcs',edit_dist:'08_edit_dist',
+    knapsack:'09_knapsack',complete_pack:'10_complete_pack',
+    multi_pack:'11_multi_pack',group_pack:'12_group_pack',pack_var:'13_pack_var',
+    interval_basic:'14_interval_basic',interval_circle:'15_interval_circle',
+    interval_palindrome:'16_interval_palindrome',interval_score:'17_interval_score',
+    tree_basic:'18_tree_basic',tree_diameter:'19_tree_diameter',
+    tree_pack:'20_tree_pack',tree_reroot:'21_tree_reroot',
+    bit_intro:'22_bit_intro',statecomp_board:'23_statecomp_board',
+    statecomp_tsp:'24_statecomp_tsp',statecomp_adv:'25_statecomp_adv',
+    digit_basic:'26_digit_basic',digit_adv:'27_digit_adv',
+    prob_dp:'28_prob_dp',expect_dp:'29_expect_dp',
+  };
+  const checks=Object.entries(FILE_MAP).map(([id,file])=>
+    fetch('data/'+file+'.js',{method:'HEAD'}).then(r=>r.ok?id:null).catch(()=>null)
+  );
+  const results=await Promise.all(checks);
+  const readySet=new Set(results.filter(Boolean));
   const p=lp();
   let totalStars=0,doneFull=0,inP=0;
   Object.entries(p.done||{}).forEach(([,ranks])=>{
@@ -227,7 +248,7 @@ function render(){
     const s=Object.values(ranks).reduce((a,v)=>a+(v||0),0);
     totalStars+=s; if(n===3)doneFull++; else if(n>0)inP++;
   });
-  const available=Object.values(CH).filter(c=>!c.coming).length;
+  const available=Object.keys(CH).filter(id=>readySet.has(id)).length;
   const pct=Math.round(doneFull/available*100);
 
   const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
@@ -271,11 +292,11 @@ function render(){
     const grid=sec.querySelector('.chapter-grid');
     mod.chapters.forEach(id=>{
       const c=CH[id]; if(!c)return;
-      const ok=unlocked(id,p);
+      const ok=unlocked(id,p,readySet);
       const st=getStars(id,p);
       const dr=p.done[id]?Object.keys(p.done[id]).length:0;
       const allDone=dr===3;
-      const coming=!!c.coming;
+      const coming=!readySet.has(id);
 
       const card=document.createElement('div');
       let cls='cc';
