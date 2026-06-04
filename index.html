@@ -190,7 +190,7 @@ const CH={
   multi_pack:  {n:'11',t:'多重背包与二进制优化',  s:'二进制拆分降复杂度',   tags:['背包','二进制拆分'],   d:3,min:65,pre:['complete_pack']},
   group_pack:  {n:'12',t:'分组背包',             s:'组内只选一件',         tags:['背包','互斥选择'],     d:3,min:60,pre:['multi_pack']},
   pack_var:    {n:'13',t:'背包模型多元变形',      s:'方案数·恰好凑齐',     tags:['背包','变形应用'],     d:3,min:65,pre:['group_pack']},
-  interval_basic:{n:'14',t:'区间 DP 入门',       s:'石子合并（链状）',     tags:['区间DP','枚举断点'],   d:3,min:65,pre:['lcs']},
+  interval_basic:{n:'14',t:'区间 DP 入门',       s:'石子合并（链状）',     tags:['区间DP','枚举断点'],   d:3,min:65,pre:['lcs'],coming:0},
   interval_circle:{n:'15',t:'环形区间 DP',       s:'断环为链',             tags:['区间DP','环形'],       d:3,min:65,pre:['interval_basic'],coming:1},
   interval_palindrome:{n:'16',t:'回文型区间 DP', s:'最长回文子序列',       tags:['区间DP','回文'],       d:3,min:60,pre:['interval_circle'],coming:1},
   interval_score:{n:'17',t:'区间 DP 得分变形',   s:'能量项链·矩阵连乘',   tags:['区间DP','综合'],       d:3,min:70,pre:['interval_palindrome'],coming:1},
