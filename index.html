@@ -187,60 +187,39 @@ const CH={
   edit_dist:   {n:'08',t:'编辑距离',             s:'增删改三种操作',       tags:['字符串DP','操作距离'], d:2,min:55,pre:['lcs']},
   knapsack:    {n:'09',t:'0/1 背包',             s:'逆序枚举的秘密',       tags:['背包','滚动数组'],     d:2,min:60,pre:['linear_dp']},
   complete_pack:{n:'10',t:'完全背包',            s:'正序枚举对比教学',     tags:['背包','无限选取'],     d:2,min:55,pre:['knapsack']},
-  multi_pack:  {n:'11',t:'多重背包与二进制优化',  s:'二进制拆分降复杂度',   tags:['背包','二进制拆分'],   d:3,min:65,pre:['complete_pack']},
-  group_pack:  {n:'12',t:'分组背包',             s:'组内只选一件',         tags:['背包','互斥选择'],     d:3,min:60,pre:['multi_pack']},
-  pack_var:    {n:'13',t:'背包模型多元变形',      s:'方案数·恰好凑齐',     tags:['背包','变形应用'],     d:3,min:65,pre:['group_pack']},
-  interval_basic:{n:'14',t:'区间 DP 入门',       s:'石子合并（链状）',     tags:['区间DP','枚举断点'],   d:3,min:65,pre:['pack_var']},
-  interval_circle:{n:'15',t:'环形区间 DP',       s:'断环为链',             tags:['区间DP','环形'],       d:3,min:65,pre:['interval_basic'],
-  interval_palindrome:{n:'16',t:'回文型区间 DP', s:'最长回文子序列',       tags:['区间DP','回文'],       d:3,min:60,pre:['interval_circle']},
-  interval_score:{n:'17',t:'区间 DP 得分变形',   s:'能量项链·矩阵连乘',   tags:['区间DP','综合'],       d:3,min:70,pre:['interval_palindrome']},
-  tree_basic:  {n:'18',t:'树形 DP 基础',         s:'没有上司的舞会',       tags:['树形DP','DFS'],        d:3,min:65,pre:['lcs']},
-  tree_diameter:{n:'19',t:'树的直径',            s:'两次 DFS 求最长路径',  tags:['树形DP','直径'],       d:3,min:60,pre:['tree_basic']},
-  tree_pack:   {n:'20',t:'树上背包',             s:'有依赖的背包',         tags:['树形DP','子树合并'],   d:3,min:75,pre:['tree_diameter']},
-  tree_reroot: {n:'21',t:'换根 DP',              s:'父节点信息补偿',       tags:['树形DP','换根'],       d:3,min:70,pre:['tree_pack']},
-  bit_intro:   {n:'22',t:'二进制位运算基础',     s:'集合的位运算表示',     tags:['位运算','集合枚举'],   d:2,min:45,pre:['knapsack']},
-  statecomp_board:{n:'23',t:'棋盘类状压 DP',     s:'互不侵犯·玉米田',     tags:['状压DP','棋盘'],       d:3,min:70,pre:['bit_intro']},
-  statecomp_tsp:{n:'24',t:'集合类状压 DP · TSP', s:'旅行商问题',           tags:['状压DP','TSP'],        d:3,min:70,pre:['statecomp_board']},
-  statecomp_adv:{n:'25',t:'状压 DP 综合',        s:'轮廓线 DP 入门',       tags:['状压DP','进阶'],       d:3,min:75,pre:['statecomp_tsp']},
-  digit_basic: {n:'26',t:'数位 DP 基础',         s:'逐位决策框架',         tags:['数位DP','记忆化'],     d:3,min:70,pre:['linear_dp']},
-  digit_adv:   {n:'27',t:'数位 DP 进阶',         s:'带约束的数位计数',     tags:['数位DP','扩展维度'],   d:3,min:70,pre:['digit_basic']},
-  prob_dp:     {n:'28',t:'概率 DP',              s:'加权后继状态转移',     tags:['概率DP','期望'],       d:3,min:65,pre:['linear_dp']},
-  expect_dp:   {n:'29',t:'期望 DP',              s:'逆推期望值',           tags:['期望DP','逆推'],       d:3,min:65,pre:['prob_dp']},
+  multi_pack:  {n:'11',t:'多重背包与二进制优化',  s:'二进制拆分降复杂度',   tags:['背包','二进制拆分'],   d:3,min:65,pre:['complete_pack'],coming:1},
+  group_pack:  {n:'12',t:'分组背包',             s:'组内只选一件',         tags:['背包','互斥选择'],     d:3,min:60,pre:['multi_pack'],coming:1},
+  pack_var:    {n:'13',t:'背包模型多元变形',      s:'方案数·恰好凑齐',     tags:['背包','变形应用'],     d:3,min:65,pre:['group_pack'],coming:1},
+  interval_basic:{n:'14',t:'区间 DP 入门',       s:'石子合并（链状）',     tags:['区间DP','枚举断点'],   d:3,min:65,pre:['lcs'],coming:1},
+  interval_circle:{n:'15',t:'环形区间 DP',       s:'断环为链',             tags:['区间DP','环形'],       d:3,min:65,pre:['interval_basic'],coming:1},
+  interval_palindrome:{n:'16',t:'回文型区间 DP', s:'最长回文子序列',       tags:['区间DP','回文'],       d:3,min:60,pre:['interval_circle'],coming:1},
+  interval_score:{n:'17',t:'区间 DP 得分变形',   s:'能量项链·矩阵连乘',   tags:['区间DP','综合'],       d:3,min:70,pre:['interval_palindrome'],coming:1},
+  tree_basic:  {n:'18',t:'树形 DP 基础',         s:'没有上司的舞会',       tags:['树形DP','DFS'],        d:3,min:65,pre:['lcs'],coming:1},
+  tree_diameter:{n:'19',t:'树的直径',            s:'两次 DFS 求最长路径',  tags:['树形DP','直径'],       d:3,min:60,pre:['tree_basic'],coming:1},
+  tree_pack:   {n:'20',t:'树上背包',             s:'有依赖的背包',         tags:['树形DP','子树合并'],   d:3,min:75,pre:['tree_diameter'],coming:1},
+  tree_reroot: {n:'21',t:'换根 DP',              s:'父节点信息补偿',       tags:['树形DP','换根'],       d:3,min:70,pre:['tree_pack'],coming:1},
+  bit_intro:   {n:'22',t:'二进制位运算基础',     s:'集合的位运算表示',     tags:['位运算','集合枚举'],   d:2,min:45,pre:['knapsack'],coming:1},
+  statecomp_board:{n:'23',t:'棋盘类状压 DP',     s:'互不侵犯·玉米田',     tags:['状压DP','棋盘'],       d:3,min:70,pre:['bit_intro'],coming:1},
+  statecomp_tsp:{n:'24',t:'集合类状压 DP · TSP', s:'旅行商问题',           tags:['状压DP','TSP'],        d:3,min:70,pre:['statecomp_board'],coming:1},
+  statecomp_adv:{n:'25',t:'状压 DP 综合',        s:'轮廓线 DP 入门',       tags:['状压DP','进阶'],       d:3,min:75,pre:['statecomp_tsp'],coming:1},
+  digit_basic: {n:'26',t:'数位 DP 基础',         s:'逐位决策框架',         tags:['数位DP','记忆化'],     d:3,min:70,pre:['linear_dp'],coming:1},
+  digit_adv:   {n:'27',t:'数位 DP 进阶',         s:'带约束的数位计数',     tags:['数位DP','扩展维度'],   d:3,min:70,pre:['digit_basic'],coming:1},
+  prob_dp:     {n:'28',t:'概率 DP',              s:'加权后继状态转移',     tags:['概率DP','期望'],       d:3,min:65,pre:['linear_dp'],coming:1},
+  expect_dp:   {n:'29',t:'期望 DP',              s:'逆推期望值',           tags:['期望DP','逆推'],       d:3,min:65,pre:['prob_dp'],coming:1},
 };
 
 const KEY='dpquest_v1';
 const lp=()=>{try{return JSON.parse(localStorage.getItem(KEY))||{coins:0,xp:0,done:{}};}catch{return{coins:0,xp:0,done:{}};}};
 
-function unlocked(id,p,readySet){
-  const c=CH[id]; if(!c||!readySet.has(id))return false;
+function unlocked(id,p){
+  const c=CH[id]; if(!c||c.coming)return false;
   return !c.pre.length||c.pre.every(x=>p.done[x]&&Object.keys(p.done[x]).length>0);
 }
 function getStars(id,p){
   return p.done[id]?Object.values(p.done[id]).reduce((a,v)=>a+(v||0),0):0;
 }
 
-async function render(){
-  // 自动探测 data/ 目录下哪些章节文件存在，无需手动维护清单
-  const FILE_MAP={
-    fib:'01_fib',triangle:'02_triangle',
-    grid_dp:'03_grid_dp',linear_dp:'04_linear_dp',maxsubarray:'05_maxsubarray',
-    lis:'06_lis',lcs:'07_lcs',edit_dist:'08_edit_dist',
-    knapsack:'09_knapsack',complete_pack:'10_complete_pack',
-    multi_pack:'11_multi_pack',group_pack:'12_group_pack',pack_var:'13_pack_var',
-    interval_basic:'14_interval_basic',interval_circle:'15_interval_circle',
-    interval_palindrome:'16_interval_palindrome',interval_score:'17_interval_score',
-    tree_basic:'18_tree_basic',tree_diameter:'19_tree_diameter',
-    tree_pack:'20_tree_pack',tree_reroot:'21_tree_reroot',
-    bit_intro:'22_bit_intro',statecomp_board:'23_statecomp_board',
-    statecomp_tsp:'24_statecomp_tsp',statecomp_adv:'25_statecomp_adv',
-    digit_basic:'26_digit_basic',digit_adv:'27_digit_adv',
-    prob_dp:'28_prob_dp',expect_dp:'29_expect_dp',
-  };
-  const checks=Object.entries(FILE_MAP).map(([id,file])=>
-    fetch('data/'+file+'.js',{method:'HEAD'}).then(r=>r.ok?id:null).catch(()=>null)
-  );
-  const results=await Promise.all(checks);
-  const readySet=new Set(results.filter(Boolean));
+function render(){
   const p=lp();
   let totalStars=0,doneFull=0,inP=0;
   Object.entries(p.done||{}).forEach(([,ranks])=>{
@@ -248,7 +227,7 @@ async function render(){
     const s=Object.values(ranks).reduce((a,v)=>a+(v||0),0);
     totalStars+=s; if(n===3)doneFull++; else if(n>0)inP++;
   });
-  const available=Object.keys(CH).filter(id=>readySet.has(id)).length;
+  const available=Object.values(CH).filter(c=>!c.coming).length;
   const pct=Math.round(doneFull/available*100);
 
   const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
@@ -292,11 +271,11 @@ async function render(){
     const grid=sec.querySelector('.chapter-grid');
     mod.chapters.forEach(id=>{
       const c=CH[id]; if(!c)return;
-      const ok=unlocked(id,p,readySet);
+      const ok=unlocked(id,p);
       const st=getStars(id,p);
       const dr=p.done[id]?Object.keys(p.done[id]).length:0;
       const allDone=dr===3;
-      const coming=!readySet.has(id);
+      const coming=!!c.coming;
 
       const card=document.createElement('div');
       let cls='cc';
@@ -327,13 +306,7 @@ async function render(){
           <div class="cc-stars">${stars}</div>
           <span class="cc-rank">${coming?'待开发':dr+'/3'}</span>
         </div>
-        <div style="display:flex;gap:5px;margin-top:2px">
-          <button class="cc-btn ${bcls}" style="flex:1"
-            onclick="event.stopPropagation();go('${id}',${ok&&!coming})">${btxt}</button>
-          ${ok&&!coming?`<button class="cc-btn" title="复制章节链接"
-            style="width:32px;flex-shrink:0;background:var(--bg3);color:var(--text2);border:1px solid var(--border);padding:0"
-            onclick="event.stopPropagation();copyLink('${id}')">🔗</button>`:''}
-        </div>`;
+        <button class="cc-btn ${bcls}" onclick="event.stopPropagation();go('${id}',${ok&&!coming})">${btxt}</button>`;
 
       if(ok&&!coming) card.addEventListener('click',()=>go(id,true));
       grid.appendChild(card);
@@ -342,22 +315,6 @@ async function render(){
 }
 
 function go(id,ok){if(!ok)return;location.href='lesson.html?id='+id;}
-
-function copyLink(id){
-  const base=location.href.replace(/index\.html.*$/,'');
-  const url=base+'lesson.html?id='+id;
-  navigator.clipboard.writeText(url).then(()=>{
-    const t=document.createElement('div');
-    t.textContent='🔗 链接已复制 ✓';
-    t.style.cssText='position:fixed;bottom:28px;left:50%;transform:translateX(-50%) scale(.9);background:#1a2240;color:#fff;padding:9px 22px;border-radius:22px;font-size:13px;font-weight:500;z-index:9999;opacity:0;transition:all .2s;pointer-events:none;font-family:var(--font)';
-    document.body.appendChild(t);
-    requestAnimationFrame(()=>{t.style.opacity='1';t.style.transform='translateX(-50%) scale(1)';});
-    setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),200);},2000);
-  }).catch(()=>{
-    prompt('复制此链接：',url);
-  });
-}
-
 function doReset(){
   if(confirm('确认重置所有学习进度？金币、星级、通关记录将全部清零。')){
     localStorage.removeItem(KEY);render();
