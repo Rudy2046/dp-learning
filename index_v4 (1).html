@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOIP/CSP · 信息学竞赛全系列</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f0f3fa;--bg2:#ffffff;--bg3:#edf0f8;--bg4:#e0e5f0;
+  --border:#d0d8ea;--border2:#b0bdd8;
+  --text:#18204a;--text2:#4a5580;--text3:#8a96b8;
+  --blue:#2563eb;--blue2:#1d4ed8;--bluebg:#eff4ff;--blueb:#bfdbfe;
+  --green:#059669;--greenbg:#ecfdf5;--greenb:#a7f3d0;
+  --gold:#d97706;--goldbg:#fffbeb;--goldb:#fde68a;
+  --red:#dc2626;--redbg:#fef2f2;--redb:#fecaca;
+  --purple:#7c3aed;--purplebg:#f5f3ff;--purpleb:#ddd6fe;
+  --teal:#0d9488;--tealbg:#f0fdfa;--tealb:#99f6e4;
+  --coral:#ea580c;--coralbg:#fff7ed;--coralb:#fed7aa;
+  --pink:#be185d;--pinkbg:#fdf2f8;--pinkb:#fbcfe8;
+  --font:'Noto Sans SC',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--font)}
+
+.topbar{height:58px;background:var(--bg2);border-bottom:1.5px solid var(--border);display:flex;align-items:center;padding:0 28px;gap:20px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(37,99,235,.06)}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-mark{width:34px;height:34px;border-radius:9px;background:var(--blue);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:900;letter-spacing:-.02em}
+.logo-name{font-size:16px;font-weight:900;color:var(--text);letter-spacing:-.02em}
+.logo-tag{font-size:10px;color:var(--text3);font-weight:400;margin-left:6px;vertical-align:1px}
+.tb-fill{flex:1}
+.tb-prog{display:flex;align-items:center;gap:10px;max-width:320px;width:100%}
+.tb-bar{flex:1;height:6px;background:var(--bg4);border-radius:3px;overflow:hidden}
+.tb-bar-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--purple));border-radius:3px;transition:width .8s ease}
+.tb-prog-txt{font-size:12px;color:var(--text2);white-space:nowrap;font-weight:500;min-width:60px}
+.tb-right{display:flex;align-items:center;gap:10px}
+.chip{display:flex;align-items:center;gap:5px;border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--text2);background:var(--bg3)}
+.chip b{color:var(--text);font-size:13px;margin-left:2px}
+.gold-chip{background:var(--goldbg);border-color:var(--goldb);border-radius:20px;padding:5px 14px;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--gold)}
+.gold-orb{width:10px;height:10px;border-radius:50%;background:var(--gold)}
+
+.hero{background:var(--bg2);border-bottom:1.5px solid var(--border);padding:44px 28px 36px;text-align:center}
+.hero-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);background:var(--bluebg);border:1px solid var(--blueb);border-radius:20px;padding:4px 14px;margin-bottom:18px}
+.hero h1{font-size:32px;font-weight:900;letter-spacing:-.03em;margin-bottom:10px;color:var(--text)}
+.hero h1 em{color:var(--blue);font-style:normal}
+.hero p{font-size:14px;color:var(--text2);max-width:500px;margin:0 auto 24px;line-height:1.8}
+.hero-kpis{display:flex;justify-content:center;gap:0;flex-wrap:wrap}
+.kpi{padding:12px 28px;border-right:1px solid var(--border);text-align:center}
+.kpi:last-child{border-right:none}
+.kpi-val{font-size:26px;font-weight:900}
+.kpi-val.c-blue{color:var(--blue)}
+.kpi-val.c-gold{color:var(--gold)}
+.kpi-val.c-green{color:var(--green)}
+.kpi-val.c-purple{color:var(--purple)}
+.kpi-lbl{font-size:11px;color:var(--text3);margin-top:2px}
+
+.content{max-width:1180px;margin:0 auto;padding:28px 28px 60px}
+
+.mod-section{margin-bottom:8px}
+.mod-header{display:flex;align-items:center;gap:12px;padding:28px 0 14px}
+.mod-header:first-of-type{padding-top:0}
+.mod-badge{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.mod-pill{height:28px;padding:0 12px;border-radius:14px;display:flex;align-items:center;font-size:11px;font-weight:700;letter-spacing:.04em}
+.m1-pill{background:var(--bluebg);color:var(--blue);border:1px solid var(--blueb)}
+.m2-pill{background:var(--purplebg);color:var(--purple);border:1px solid var(--purpleb)}
+.m3-pill{background:var(--goldbg);color:var(--gold);border:1px solid var(--goldb)}
+.m4-pill{background:var(--tealbg);color:var(--teal);border:1px solid var(--tealb)}
+.m5-pill{background:var(--greenbg);color:var(--green);border:1px solid var(--greenb)}
+.m6-pill{background:var(--coralbg);color:var(--coral);border:1px solid var(--coralb)}
+.m7-pill{background:var(--pinkbg);color:var(--pink);border:1px solid var(--pinkb)}
+.s0-pill{background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0}
+.m8-pill{background:#fef3c7;color:#b45309;border:1px solid #fde68a}
+.mod-title-txt{font-size:14px;font-weight:700;color:var(--text)}
+.mod-sub-txt{font-size:12px;color:var(--text2)}
+.mod-divider{flex:1;height:1px;background:var(--border)}
+.mod-prog-txt{font-size:11px;color:var(--text3);white-space:nowrap;font-family:var(--mono)}
+
+.chapter-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:10px}
+
+/* ── 视图切换按钮 ── */
+.view-toggle{display:flex;gap:6px;margin:20px 0 4px;justify-content:flex-end}
+.vt-btn{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid var(--border);background:var(--bg2);color:var(--text2);cursor:pointer;font-family:var(--font);transition:all .15s}
+.vt-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.vt-btn:hover:not(.active){border-color:var(--blue);color:var(--blue)}
+
+/* ── 目录模式 ── */
+.tree-mod{margin-bottom:6px;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--bg2)}
+.tree-mod-hd{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;user-select:none;transition:background .15s}
+.tree-mod-hd:hover{background:var(--bg3)}
+.tree-arrow{font-size:10px;color:var(--text3);transition:transform .2s;flex-shrink:0}
+.tree-arrow.open{transform:rotate(90deg)}
+.tree-mod-title{font-size:13px;font-weight:700;color:var(--text);flex:1}
+.tree-mod-prog{font-size:11px;color:var(--text3);font-family:var(--mono)}
+.tree-chapters{overflow:hidden;transition:max-height .25s ease}
+.tree-chapters.collapsed{max-height:0!important}
+.tree-chap{border-top:1px solid var(--border)}
+.tree-chap-hd{display:flex;align-items:center;gap:8px;padding:9px 16px 9px 32px;cursor:pointer;transition:background .15s}
+.tree-chap-hd:hover{background:var(--bg3)}
+.tree-chap-arrow{font-size:9px;color:var(--text3);transition:transform .2s;flex-shrink:0}
+.tree-chap-arrow.open{transform:rotate(90deg)}
+.tree-chap-num{font-size:10px;font-weight:700;font-family:var(--mono);color:var(--text3);flex-shrink:0;min-width:36px}
+.tree-chap-title{font-size:12px;font-weight:600;color:var(--text);flex:1}
+.tree-chap-stars{display:flex;gap:1px;font-size:10px;flex-shrink:0}
+.tree-pts{overflow:hidden;transition:max-height .2s ease;background:var(--bg3)}
+.tree-pts.collapsed{max-height:0!important}
+.tree-pt{display:flex;align-items:center;gap:8px;padding:5px 16px 5px 56px;font-size:11px;color:var(--text2)}
+.tree-pt::before{content:'·';color:var(--text3);font-size:14px;flex-shrink:0}
+.tree-chap-go{font-size:10px;padding:3px 10px;border-radius:10px;border:1px solid var(--blue);color:var(--blue);background:none;cursor:pointer;font-family:var(--font);flex-shrink:0;transition:all .15s}
+.tree-chap-go:hover{background:var(--blue);color:#fff}
+.tree-chap-go.done{border-color:var(--green);color:var(--green)}
+.tree-chap-go.done:hover{background:var(--green);color:#fff}
+
+.cc{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:9px;cursor:pointer;transition:border-color .18s,transform .18s,box-shadow .18s;position:relative;overflow:hidden}
+.cc:hover:not(.cc-lock):not(.cc-coming){border-color:var(--blue);transform:translateY(-2px);box-shadow:0 6px 24px rgba(37,99,235,.1)}
+.cc.cc-done{border-color:var(--greenb)}
+.cc.cc-done::after{content:'✓ 全通关';position:absolute;top:0;right:0;font-size:9px;font-weight:700;color:var(--green);background:var(--greenbg);border-left:1px solid var(--greenb);border-bottom:1px solid var(--greenb);padding:3px 7px;border-radius:0 12px 0 8px}
+.cc.cc-lock{opacity:.5;cursor:not-allowed}
+.cc.cc-coming{opacity:.5;cursor:default;border-style:dashed}
+.cc-top{display:flex;align-items:center;justify-content:space-between}
+.cc-num{font-size:10px;font-weight:700;font-family:var(--mono);color:var(--text3)}
+.cc-diff{display:flex;gap:3px}
+.dd{width:7px;height:7px;border-radius:50%}
+.dd-on{background:var(--gold)}
+.dd-off{background:var(--border2)}
+.cc-title{font-size:13px;font-weight:700;color:var(--text);line-height:1.4}
+.cc-sub{font-size:11px;color:var(--text2)}
+.tags{display:flex;flex-wrap:wrap;gap:4px}
+.tag{font-size:10px;padding:2px 6px;border-radius:4px;border:1px solid var(--border);background:var(--bg3);color:var(--text3)}
+.cc-foot{display:flex;align-items:center;justify-content:space-between}
+.cc-stars{display:flex;gap:1px;font-size:11px}
+.sl{color:var(--gold)}
+.sd{color:var(--border2)}
+.cc-rank{font-size:10px;color:var(--text3);font-family:var(--mono)}
+.cc-btn{width:100%;padding:7px;border-radius:7px;font-size:11px;font-weight:700;border:none;cursor:pointer;font-family:var(--font);transition:all .15s;margin-top:2px}
+.b-go{background:var(--blue);color:#fff}
+.b-go:hover{background:var(--blue2)}
+.b-cont{background:var(--bg3);color:var(--blue);border:1px solid var(--blueb)}
+.b-cont:hover{background:var(--bluebg)}
+.b-done{background:var(--greenbg);color:var(--green);border:1px solid var(--greenb)}
+.b-done:hover{background:#d1fae5}
+.b-lock{background:var(--bg4);color:var(--text3);cursor:not-allowed;border:1px solid var(--border)}
+.b-come{background:var(--bg4);color:var(--text3);cursor:default;border:1px dashed var(--border)}
+
+.footer{background:var(--bg2);border-top:1.5px solid var(--border);padding:22px 28px;display:flex;align-items:center;justify-content:center;gap:36px;flex-wrap:wrap}
+.fstat{text-align:center}
+.fval{font-size:22px;font-weight:900}
+.fval.gold{color:var(--gold)}
+.fval.green{color:var(--green)}
+.fval.blue{color:var(--blue)}
+.fval.purple{color:var(--purple)}
+.flbl{font-size:11px;color:var(--text3);margin-top:2px}
+.reset-btn{font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer;font-family:var(--font);text-decoration:underline;text-underline-offset:3px}
+.reset-btn:hover{color:var(--red)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="logo" href="index.html">
+    <div class="logo-mark">⚔</div>
+    <span class="logo-name">NOIP/CSP<span class="logo-tag">信息学竞赛全系列</span></span>
+  </a>
+  <div class="tb-fill"></div>
+  <div class="tb-prog">
+    <div class="tb-bar"><div class="tb-bar-fill" id="tb-fill" style="width:0%"></div></div>
+    <span class="tb-prog-txt" id="tb-txt">0 / 14 章节</span>
+  </div>
+  <div class="tb-right">
+    <div class="chip">经验 <b id="tb-xp">0</b></div>
+    <div class="gold-chip"><div class="gold-orb"></div><span id="tb-coins">0</span></div>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-badge">信息学CSP · GESP · 29章 · 七大模块</div>
+  <h1>从递推到树形，<em>逐关击破</em>动态规划</h1>
+  <p>每章三个难度关卡（新兵·锐士·英雄），循序渐进解锁，完成前置章节自动开放下一关。</p>
+  <div class="hero-kpis" id="hero-kpis">
+    <div class="kpi"><div class="kpi-val c-blue" id="kpi-done">0</div><div class="kpi-lbl">已通关章节</div></div>
+    <div class="kpi"><div class="kpi-val c-gold" id="kpi-coins">0</div><div class="kpi-lbl">精灵币</div></div>
+    <div class="kpi"><div class="kpi-val c-green" id="kpi-stars">0</div><div class="kpi-lbl">获得星级</div></div>
+    <div class="kpi"><div class="kpi-val c-purple" id="kpi-prog">0</div><div class="kpi-lbl">进行中</div></div>
+  </div>
+</div>
+
+<div class="content">
+  <div class="view-toggle">
+    <button class="vt-btn active" id="btn-card" onclick="setView('card')">🃏 关卡卡片</button>
+    <button class="vt-btn" id="btn-tree" onclick="setView('tree')">📋 知识点目录</button>
+  </div>
+  <div id="content"></div>
+  <div id="tree-content" style="display:none"></div>
+</div>
+
+<div class="footer">
+  <div class="fstat"><div class="fval gold" id="f-coins">0</div><div class="flbl">精灵币</div></div>
+  <div class="fstat"><div class="fval green" id="f-done">0</div><div class="flbl">全通关</div></div>
+  <div class="fstat"><div class="fval blue" id="f-stars">0</div><div class="flbl">星级总计</div></div>
+  <div class="fstat"><div class="fval purple" id="f-prog">0</div><div class="flbl">进行中</div></div>
+  <button class="reset-btn" onclick="doReset()">重置进度</button>
+</div>
+
+<script>
+const MODS=[
+  {key:'s0',pill:'s0-pill',label:'专题一',title:'递归与搜索',sub:'DFS · BFS · 回溯剪枝',
+   chapters:['recursion','dfs_basic','dfs_advanced','bfs_basic','bfs_advanced','backtrack']},
+  {key:'m1',pill:'m1-pill',label:'专题二',title:'动态规划引入',sub:'从暴力递归到记忆化搜索',
+   chapters:['fib','triangle']},
+  {key:'m2',pill:'m2-pill',label:'专题三',title:'坐标型与线性 DP',sub:'网格 · 一维线性 · 双序列',
+   chapters:['grid_dp','linear_dp','maxsubarray','lis','lcs','edit_dist']},
+  {key:'m3',pill:'m3-pill',label:'专题四',title:'背包 DP',sub:'高频考点分水岭',
+   chapters:['knapsack','complete_pack','multi_pack','group_pack','pack_var']},
+  {key:'m4',pill:'m4-pill',label:'专题五',title:'区间 DP',sub:'结构划分',
+   chapters:['interval_basic','interval_circle','interval_palindrome','interval_score']},
+  {key:'m5',pill:'m5-pill',label:'专题六',title:'树形 DP',sub:'高级结构',
+   chapters:['tree_basic','tree_diameter','tree_pack','tree_reroot']},
+  {key:'m6',pill:'m6-pill',label:'专题七',title:'状态压缩 DP',sub:'竞赛进阶',
+   chapters:['bit_intro','statecomp_board','statecomp_tsp','statecomp_adv']},
+  {key:'m7',pill:'m7-pill',label:'专题八',title:'数学与特殊 DP',sub:'超凡拓展',
+   chapters:['digit_basic','digit_adv','prob_dp','expect_dp']},
+];
+
+const CH={
+  // ── 专题一：递归与搜索 ──
+  recursion:    {n:'S01',t:'S01.递归基础',            s:'函数调用自身的本质',   tags:['递归','调用栈'],       d:1,min:40,pre:[],   pts:['函数调用自身的本质','递归三要素（终止条件、递归体、返回值）','经典例子：阶乘、斐波那契']},
+  dfs_basic:    {n:'S02',t:'S02.DFS上：树与迷宫',     s:'一条路走到黑再回头',   tags:['DFS','树遍历','迷宫'], d:1,min:45,pre:['recursion'],pts:['DFS本质（一条路走到黑再回头）','递归实现框架','树的DFS遍历（前中后序）','迷宫路径问题']},
+  dfs_advanced: {n:'S03',t:'S03.DFS下：图与连通性',   s:'连通块·岛屿·flood fill',tags:['DFS','连通块','图'],  d:2,min:50,pre:['dfs_basic'],pts:['图上DFS（visited数组防重复）','连通块计数','岛屿问题','flood fill']},
+  bfs_basic:    {n:'S04',t:'S04.BFS上：基础与最短路', s:'一圈一圈往外扩',       tags:['BFS','队列','迷宫'],   d:1,min:45,pre:['recursion'],pts:['BFS本质（一圈一圈往外扩）','队列实现框架','迷宫最短路','多源BFS']},
+  bfs_advanced: {n:'S05',t:'S05.BFS下：进阶应用',     s:'多源BFS·0-1BFS',      tags:['BFS','多源','双向'],   d:2,min:55,pre:['bfs_basic'],pts:['0-1 BFS','双向BFS','BFS判断二分图']},
+  backtrack:    {n:'S06',t:'S06.回溯与剪枝',          s:'全排列·N皇后·剪枝策略',tags:['回溯','剪枝','枚举'],  d:2,min:55,pre:['dfs_basic'],pts:['回溯框架','全排列','N皇后','剪枝策略（可行性/最优性）']},
+  // ── 专题二：动态规划引入 ──
+  fib:         {n:'01',t:'斐波那契与记忆化搜索',s:'重叠子问题初体验',     tags:['递归','记忆化'],       d:1,min:40,pre:[],   pts:['重叠子问题的本质','记忆化搜索（自顶向下）','自底向上递推对比']},
+  triangle:    {n:'02',t:'数字三角形',           s:'自底向上递推入门',     tags:['坐标DP','递推'],       d:1,min:40,pre:['fib'],pts:['状态定义dp[i][j]','自底向上递推方向','一维滚动数组优化']},
+  grid_dp:     {n:'03',t:'位置型网格 DP',         s:'不同路径·最小路径和', tags:['网格DP','坐标状态'],   d:1,min:45,pre:['triangle'],pts:['坐标即状态','不同路径计数','最小路径和','带障碍物变形']},
+  linear_dp:   {n:'04',t:'一维线性 DP 基础',      s:'爬楼梯·打家劫舍',    tags:['线性DP','选或不选'],   d:1,min:45,pre:['grid_dp'],pts:['爬楼梯状态转移','打家劫舍选或不选','一维状态机']},
+  maxsubarray: {n:'05',t:'最大连续子段和',        s:'Kadane 算法精讲',     tags:['以i结尾','Kadane'],    d:1,min:45,pre:['linear_dp'],pts:['以i结尾的最优值','Kadane核心决策','全负数处理','记录起止位置']},
+  lis:         {n:'06',t:'LIS 专题',             s:'最长递增子序列',       tags:['以i结尾','回看扫描'],  d:2,min:50,pre:['maxsubarray'],pts:['以i结尾的最长递增序列','O(n²)DP做法','贪心+二分O(nlogn)']},
+  lcs:         {n:'07',t:'LCS 专题',             s:'最长公共子序列',       tags:['双序列','二维DP'],     d:2,min:55,pre:['lis'],pts:['二维dp[i][j]定义','末尾相等/不等两种转移','回溯打印具体LCS','LCS vs 最长公共子串']},
+  edit_dist:   {n:'08',t:'编辑距离',             s:'增删改三种操作',       tags:['字符串DP','操作距离'], d:2,min:55,pre:['lcs'],pts:['三种操作对应三个方向','dp[i][j]定义','转移方程','路径追踪']},
+  knapsack:    {n:'09',t:'0/1 背包',             s:'逆序枚举的秘密',       tags:['背包','滚动数组'],     d:2,min:60,pre:['linear_dp'],pts:['二维dp定义','逆序枚举原因','一维滚动数组','恰好装满vs最多装满']},
+  complete_pack:{n:'10',t:'完全背包',            s:'正序枚举对比教学',     tags:['背包','无限选取'],     d:2,min:55,pre:['knapsack'],pts:['正序枚举允许重复选','与0/1背包的唯一区别','零钱兑换应用']},
+  multi_pack:  {n:'11',t:'多重背包与二进制优化',  s:'二进制拆分降复杂度',   tags:['背包','二进制拆分'],   d:3,min:65,pre:['complete_pack'],pts:['有限件数的背包','二进制拆分思路','单调队列优化']},
+  group_pack:  {n:'12',t:'分组背包',             s:'组内只选一件',         tags:['背包','互斥选择'],     d:3,min:60,pre:['multi_pack'],pts:['组内互斥选择','循环嵌套结构','与0/1背包对比']},
+  pack_var:    {n:'13',t:'背包模型多元变形',      s:'方案数·恰好凑齐',     tags:['背包','变形应用'],     d:3,min:65,pre:['group_pack'],pts:['方案数背包','恰好凑齐（-∞初始化）','最小价值背包','同一骨架不同语义']},
+  interval_basic:{n:'14',t:'区间 DP 入门',       s:'石子合并（链状）',     tags:['区间DP','枚举断点'],   d:3,min:65,pre:['lcs'],coming:0,pts:['链状区间DP框架', '按区间长度枚举', '枚举断点k', '石子合并']},
+  interval_circle:{n:'15',t:'环形区间 DP',       s:'断环为链',             tags:['区间DP','环形'],       d:3,min:65,pre:['interval_basic'],coming:0,pts:['断环为链', '复制一倍数组', '环形边界处理']},
+  interval_palindrome:{n:'16',t:'回文型区间 DP', s:'最长回文子序列',       tags:['区间DP','回文'],       d:3,min:60,pre:['interval_circle'],coming:0,pts:['两端相等向内收缩', '最长回文子序列', '与石子合并的区别']},
+  interval_score:{n:'17',t:'区间 DP 得分变形',   s:'能量项链·矩阵连乘',   tags:['区间DP','综合'],       d:3,min:70,pre:['interval_palindrome'],coming:0,pts:['带乘积/加权的转移', '能量项链', '矩阵连乘']},
+  tree_basic:  {n:'18',t:'树形 DP 基础',         s:'没有上司的舞会',       tags:['树形DP','DFS'],        d:3,min:65,pre:['lcs'],coming:0,pts:['f[u][0/1]选或不选', 'DFS后序遍历', '子节点状态汇总']},
+  tree_diameter:{n:'19',t:'树的直径',            s:'两次 DFS 求最长路径',  tags:['树形DP','直径'],       d:3,min:60,pre:['tree_basic'],coming:0,pts:['两次DFS求直径', '经过某节点的最长路', '一次DFS求直径']},
+  tree_pack:   {n:'20',t:'树上背包',             s:'有依赖的背包',         tags:['树形DP','子树合并'],   d:3,min:75,pre:['tree_diameter'],coming:0,pts:['子树合并', '容量上界为子树大小', '有依赖的背包']},
+  tree_reroot: {n:'21',t:'换根 DP',              s:'父节点信息补偿',       tags:['树形DP','换根'],       d:3,min:70,pre:['tree_pack'],coming:0,pts:['两次DFS', '父节点信息补偿', '换根公式推导']},
+  bit_intro:   {n:'22',t:'二进制位运算基础',     s:'集合的位运算表示',     tags:['位运算','集合枚举'],   d:2,min:45,pre:['knapsack'],coming:0,pts:['集合的位运算表示', '枚举子集', '常用位运算技巧']},
+  statecomp_board:{n:'23',t:'棋盘类状压 DP',     s:'互不侵犯·玉米田',     tags:['状压DP','棋盘'],       d:3,min:70,pre:['bit_intro'],coming:0,pts:['行状态压缩', '行间合法性检查', '逐行转移']},
+  statecomp_tsp:{n:'24',t:'集合类状压 DP · TSP', s:'旅行商问题',           tags:['状压DP','TSP'],        d:3,min:70,pre:['statecomp_board'],coming:0,pts:['已访问集合+当前位置', 'TSP状态定义', '与棋盘类的区别']},
+  statecomp_adv:{n:'25',t:'状压 DP 综合',        s:'轮廓线 DP 入门',       tags:['状压DP','进阶'],       d:3,min:75,pre:['statecomp_tsp'],coming:0,pts:['轮廓线DP', '逐格推进', '综合状压技巧']},
+  digit_basic: {n:'26',t:'数位 DP 基础',         s:'逐位决策框架',         tags:['数位DP','记忆化'],     d:3,min:70,pre:['linear_dp'],coming:0,pts:['逐位决策框架', 'is_limit标志位', '记忆化搜索']},
+  digit_adv:   {n:'27',t:'数位 DP 进阶',         s:'带约束的数位计数',     tags:['数位DP','扩展维度'],   d:3,min:70,pre:['digit_basic'],coming:0,pts:['增加状态维度', '数位和约束', '相邻数字关系']},
+  prob_dp:     {n:'28',t:'概率 DP',              s:'加权后继状态转移',     tags:['概率DP','期望'],       d:3,min:65,pre:['linear_dp'],coming:0,pts:['状态概率定义', '加权后继状态', '正向推导']},
+  expect_dp:   {n:'29',t:'期望 DP',              s:'逆推期望值',           tags:['期望DP','逆推'],       d:3,min:65,pre:['prob_dp'],coming:0,pts:['期望逆推', '从终态往初态', '与概率DP方向对比']},
+};
+
+const KEY='dpquest_v1';
+const lp=()=>{try{return JSON.parse(localStorage.getItem(KEY))||{coins:0,xp:0,done:{}};}catch{return{coins:0,xp:0,done:{}};}};
+
+function unlocked(id,p){
+  const c=CH[id]; if(!c||c.coming)return false;
+  return true;
+}
+function getStars(id,p){
+  return p.done[id]?Object.values(p.done[id]).reduce((a,v)=>a+(v||0),0):0;
+}
+
+function render(){
+  const p=lp();
+  let totalStars=0,doneFull=0,inP=0;
+  Object.entries(p.done||{}).forEach(([,ranks])=>{
+    const n=Object.keys(ranks).length;
+    const s=Object.values(ranks).reduce((a,v)=>a+(v||0),0);
+    totalStars+=s; if(n===3)doneFull++; else if(n>0)inP++;
+  });
+  const available=Object.values(CH).filter(c=>!c.coming).length;
+  const pct=Math.round(doneFull/available*100);
+
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  const style=(id,k,v)=>{const el=document.getElementById(id);if(el)el.style[k]=v;};
+
+  style('tb-fill','width',pct+'%');
+  set('tb-txt',doneFull+' / '+available+' 章节');
+  set('tb-xp',p.xp||0);
+  set('tb-coins',p.coins||0);
+  set('kpi-done',doneFull);
+  set('kpi-coins',p.coins||0);
+  set('kpi-stars',totalStars);
+  set('kpi-prog',inP);
+  set('f-coins',p.coins||0);
+  set('f-done',doneFull);
+  set('f-stars',totalStars);
+  set('f-prog',inP);
+
+  const content=document.getElementById('content');
+  content.innerHTML='';
+
+  MODS.forEach(mod=>{
+    const total=mod.chapters.length;
+    const done=mod.chapters.filter(id=>p.done[id]&&Object.keys(p.done[id]).length===3).length;
+
+    const sec=document.createElement('div');
+    sec.className='mod-section';
+    sec.innerHTML=`
+      <div class="mod-header">
+        <div class="mod-badge">
+          <span class="mod-pill ${mod.pill}">${mod.label}</span>
+          <span class="mod-title-txt">${mod.title}</span>
+          <span class="mod-sub-txt">· ${mod.sub}</span>
+        </div>
+        <div class="mod-divider"></div>
+        <span class="mod-prog-txt">${done}/${total}</span>
+      </div>
+      <div class="chapter-grid"></div>`;
+    content.appendChild(sec);
+
+    const grid=sec.querySelector('.chapter-grid');
+    mod.chapters.forEach(id=>{
+      const c=CH[id]; if(!c)return;
+      const ok=unlocked(id,p);
+      const st=getStars(id,p);
+      const dr=p.done[id]?Object.keys(p.done[id]).length:0;
+      const allDone=dr===3;
+      const coming=!!c.coming;
+
+      const card=document.createElement('div');
+      let cls='cc';
+      if(coming)cls+=' cc-coming';
+      else if(!ok)cls+=' cc-lock';
+      else if(allDone)cls+=' cc-done';
+      card.className=cls;
+
+      const diffs=[1,2,3].map(i=>`<span class="dd ${i<=c.d?'dd-on':'dd-off'}"></span>`).join('');
+      const stars=[...Array(9)].map((_,i)=>`<span class="${i<st?'sl':'sd'}">${i<st?'★':'☆'}</span>`).join('');
+
+      let bcls,btxt;
+      if(coming){bcls='b-come';btxt='即将开放 →';}
+      else if(!ok){bcls='b-lock';btxt='🔒 需完成前置章节';}
+      else if(allDone){bcls='b-done';btxt='✓ 全通关 · 再练一遍';}
+      else if(dr>0){bcls='b-cont';btxt='继续 · 已通 '+dr+'/3 关';}
+      else{bcls='b-go';btxt='开始学习 →';}
+
+      card.innerHTML=`
+        <div class="cc-top">
+          <span class="cc-num">${c.n}</span>
+          <div class="cc-diff">${diffs}</div>
+        </div>
+        <div class="cc-title">${c.t}</div>
+        <div class="cc-sub">${c.s}</div>
+        <div class="tags">${c.tags.map(t=>`<span class="tag">${t}</span>`).join('')}<span class="tag">⏱${c.min}m</span></div>
+        <div class="cc-foot">
+          <div class="cc-stars">${stars}</div>
+          <span class="cc-rank">${coming?'待开发':dr+'/3'}</span>
+        </div>
+        <button class="cc-btn ${bcls}" onclick="event.stopPropagation();go('${id}',${ok&&!coming})">${btxt}</button>`;
+
+      if(ok&&!coming) card.addEventListener('click',()=>go(id,true));
+      grid.appendChild(card);
+    });
+  });
+}
+
+function go(id,ok){if(!ok)return;location.href='lesson.html?id='+id;}
+function setView(v){
+  const isCard = v==='card';
+  document.getElementById('content').style.display = isCard?'':'none';
+  document.getElementById('tree-content').style.display = isCard?'none':'';
+  document.getElementById('btn-card').classList.toggle('active',isCard);
+  document.getElementById('btn-tree').classList.toggle('active',!isCard);
+  if(!isCard && !document.getElementById('tree-content').children.length) renderTree();
+}
+
+function renderTree(){
+  const p=lp();
+  const tc=document.getElementById('tree-content');
+  tc.innerHTML='';
+  MODS.forEach((mod,mi)=>{
+    const total=mod.chapters.length;
+    const done=mod.chapters.filter(id=>p.done[id]&&Object.keys(p.done[id]).length===3).length;
+    const isFirst=mi===0;
+
+    const modEl=document.createElement('div');
+    modEl.className='tree-mod';
+
+    const modHd=document.createElement('div');
+    modHd.className='tree-mod-hd';
+    modHd.innerHTML=`
+      <span class="tree-arrow ${isFirst?'open':''}">▶</span>
+      <span class="mod-pill ${mod.pill}" style="font-size:10px;height:22px;padding:0 8px">${mod.label}</span>
+      <span class="tree-mod-title">${mod.title}</span>
+      <span class="tree-mod-prog">${done}/${total} 完成</span>`;
+
+    const chapWrap=document.createElement('div');
+    chapWrap.className='tree-chapters'+(isFirst?'':' collapsed');
+    const chapH=total*80+total*4*20;
+    chapWrap.style.maxHeight=isFirst?chapH+'px':'0px';
+
+    modHd.addEventListener('click',()=>{
+      const opening=chapWrap.classList.contains('collapsed');
+      chapWrap.classList.toggle('collapsed');
+      modHd.querySelector('.tree-arrow').classList.toggle('open');
+      chapWrap.style.maxHeight=opening?chapWrap.scrollHeight+500+'px':'0px';
+    });
+
+    mod.chapters.forEach(id=>{
+      const c=CH[id]; if(!c)return;
+      const dr=p.done[id]?Object.keys(p.done[id]).length:0;
+      const st=getStars(id,p);
+      const stars=[...Array(9)].map((_,i)=>`<span style="color:${i<st?'var(--gold)':'var(--border2)'};">${i<st?'★':'☆'}</span>`).join('');
+
+      const chapEl=document.createElement('div');
+      chapEl.className='tree-chap';
+
+      const chapHd=document.createElement('div');
+      chapHd.className='tree-chap-hd';
+      const btnTxt=dr===3?'再练':'开始';
+      const btnCls=dr===3?'done':'';
+      chapHd.innerHTML=`
+        <span class="tree-chap-arrow">▶</span>
+        <span class="tree-chap-num">${c.n}</span>
+        <span class="tree-chap-title">${c.t}</span>
+        <div class="tree-chap-stars">${stars}</div>
+        <button class="tree-chap-go ${btnCls}" onclick="event.stopPropagation();go('${id}',true)">${btnTxt}</button>`;
+
+      const ptsWrap=document.createElement('div');
+      ptsWrap.className='tree-pts collapsed';
+      ptsWrap.style.maxHeight='0px';
+
+      if(c.pts&&c.pts.length){
+        c.pts.forEach(pt=>{
+          const ptEl=document.createElement('div');
+          ptEl.className='tree-pt';
+          ptEl.textContent=pt;
+          ptsWrap.appendChild(ptEl);
+        });
+      } else {
+        const ptEl=document.createElement('div');
+        ptEl.className='tree-pt';
+        ptEl.textContent=c.s;
+        ptsWrap.appendChild(ptEl);
+      }
+
+      chapHd.addEventListener('click',()=>{
+        const opening=ptsWrap.classList.contains('collapsed');
+        ptsWrap.classList.toggle('collapsed');
+        chapHd.querySelector('.tree-chap-arrow').classList.toggle('open');
+        ptsWrap.style.maxHeight=opening?ptsWrap.scrollHeight+'px':'0px';
+        if(opening && chapWrap.style.maxHeight!=='0px'){
+          chapWrap.style.maxHeight=chapWrap.scrollHeight+200+'px';
+        }
+      });
+
+      chapEl.appendChild(chapHd);
+      chapEl.appendChild(ptsWrap);
+      chapWrap.appendChild(chapEl);
+    });
+
+    modEl.appendChild(modHd);
+    modEl.appendChild(chapWrap);
+    tc.appendChild(modEl);
+  });
+}
+
+function doReset(){
+  if(confirm('确认重置所有学习进度？金币、星级、通关记录将全部清零。')){
+    localStorage.removeItem(KEY);render();
+  }
+}
+render();
+</script>
+</body>
+</html>
