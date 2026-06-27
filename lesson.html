@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>NOIP/CSP</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#181e30;--bg2:#1e2640;--bg3:#242d4e;--bg4:#2b3660;
+  --card:#222a48;--border:#354070;--border2:#4a5a90;
+  --text:#dde4f5;--text2:#8a9ac0;--text3:#5a6a90;
+  --blue:#4c7ef5;--blue2:#3a68e0;--blue-glow:rgba(76,126,245,.18);
+  --green:#1ec97a;--green2:#17a865;--green-glow:rgba(30,201,122,.15);
+  --gold:#f5b942;--gold2:#e0a030;--gold-glow:rgba(245,185,66,.15);
+  --red:#ef4f60;--red-glow:rgba(239,79,96,.12);
+  --purple:#9b72ef;--teal:#22d4c0;
+  --font:'Noto Sans SC',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font);background:var(--bg);color:var(--text);display:flex;flex-direction:column}
+
+/* TOP BAR */
+.topbar{height:52px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;flex-shrink:0;box-shadow:0 2px 12px rgba(0,0,0,.3)}
+.tb-back{display:flex;align-items:center;gap:6px;padding:0 20px;height:100%;border-right:1px solid var(--border);font-size:13px;color:var(--text2);cursor:pointer;background:none;border-top:none;border-bottom:none;border-left:none;font-family:var(--font);transition:all .15s}
+.tb-back:hover{background:var(--bg3);color:var(--text)}
+.tb-bc{padding:0 20px;flex:1}
+.tb-bc .ch{font-size:11px;color:var(--text3)}
+.tb-bc .ls{font-size:14px;font-weight:700}
+.tb-right{display:flex;align-items:center;gap:12px;padding:0 20px}
+.tb-xp{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)}
+.xp-bar{width:90px;height:6px;background:var(--bg4);border-radius:3px;overflow:hidden}
+.xp-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--blue));border-radius:3px;transition:width .5s}
+.tb-coins{display:flex;align-items:center;gap:6px;background:var(--bg4);border:1px solid var(--gold);border-radius:20px;padding:5px 14px;font-size:13px;font-weight:700;color:var(--gold)}
+.coin-gem{width:12px;height:12px;border-radius:50%;background:var(--gold);box-shadow:0 0 6px var(--gold)}
+
+/* LAYOUT */
+.layout{display:flex;flex:1;overflow:hidden}
+
+/* SIDEBAR */
+.sidebar{width:228px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.sb-top{padding:10px 12px;border-bottom:1px solid var(--border)}
+.sb-top input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;color:var(--text2);font-family:var(--font);outline:none}
+.sb-top input::placeholder{color:var(--text3)}
+.sb-top input:focus{border-color:var(--blue);color:var(--text)}
+.sb-list{flex:1;overflow-y:auto;padding:8px 0}
+.sb-list::-webkit-scrollbar{width:3px}
+.sb-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.sb-sect{padding:8px 14px 4px;font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.08em;text-transform:uppercase}
+.sb-item{display:flex;align-items:center;gap:8px;padding:8px 14px;cursor:pointer;border-left:2px solid transparent;transition:all .15s;font-size:12px;color:var(--text2)}
+.sb-item:hover{background:var(--bg3);color:var(--text)}
+.sb-item.active{border-left-color:var(--blue);background:var(--blue-glow);color:var(--text)}
+.sb-item.done{color:var(--green2)}
+.sb-item.locked{opacity:.4;cursor:not-allowed}
+.sb-ic{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0}
+.ic-done{background:var(--green);color:#fff}
+.ic-act{background:var(--blue);color:#fff}
+.ic-lock{background:var(--bg4);border:1px solid var(--border);color:var(--text3)}
+.ic-num{background:var(--bg4);border:1px solid var(--border2);color:var(--text2)}
+.sb-c{margin-left:auto;font-size:10px;color:var(--text3);white-space:nowrap}
+
+/* MAIN */
+.main{flex:1;overflow-y:auto;padding:24px;background:var(--bg)}
+.main::-webkit-scrollbar{width:4px}
+.main::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.ls-head{margin-bottom:20px}
+.ls-head h2{font-size:18px;font-weight:900;margin-bottom:4px;letter-spacing:-.01em}
+.ls-head p{font-size:12px;color:var(--text3)}
+.card-badge{display:inline-flex;align-items:center;gap:4px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:3px 10px;font-size:11px;color:var(--text2);margin-top:6px}
+
+/* BATTLE GRID */
+.battle-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px}
+.bc{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:all .2s;display:flex;flex-direction:column}
+.bc:hover:not(.bc-locked){transform:translateY(-3px);border-color:var(--border2);box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.bc.bc-locked{opacity:.5;cursor:not-allowed}
+.bc.bc-new{border-color:rgba(30,201,122,.4)}
+.bc.bc-pro{border-color:rgba(76,126,245,.4)}
+.bc.bc-hero{border-color:rgba(245,185,66,.4)}
+.bc-hd{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.rank-pill{font-size:10px;font-weight:700;padding:3px 9px;border-radius:10px;flex-shrink:0}
+.rp-n{background:rgba(30,201,122,.18);color:var(--green);border:1px solid rgba(30,201,122,.3)}
+.rp-p{background:rgba(76,126,245,.18);color:var(--blue);border:1px solid rgba(76,126,245,.3)}
+.rp-h{background:rgba(245,185,66,.18);color:var(--gold);border:1px solid rgba(245,185,66,.3)}
+.bc-name{font-size:13px;font-weight:700;flex:1}
+.bc-sc{font-size:11px;color:var(--text3)}
+.bc-sc b{color:var(--text2)}
+.bc-bd{padding:12px 14px;flex:1;display:flex;flex-direction:column;gap:8px}
+.bc-timer{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2)}
+.t-led{width:7px;height:7px;border-radius:50%}
+.led-n{background:var(--green);box-shadow:0 0 4px var(--green)}
+.led-p{background:var(--blue);box-shadow:0 0 4px var(--blue)}
+.led-h{background:var(--gold);box-shadow:0 0 4px var(--gold)}
+.bc-pgbar{height:3px;background:var(--bg4);border-radius:2px;overflow:hidden}
+.bc-pgfill{height:100%;border-radius:2px;transition:width .5s}
+.pf-n{background:var(--green)}
+.pf-p{background:var(--blue)}
+.pf-h{background:var(--gold)}
+.bc-rwds{display:flex;flex-direction:column;gap:4px}
+.rwd-line{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3)}
+.rwd-tag{font-size:9px;padding:1px 5px;border-radius:3px;background:var(--bg4);color:var(--text3);border:1px solid var(--border)}
+.star-row{display:flex;gap:3px}
+.star{font-size:14px}
+.s-lit{color:var(--gold);text-shadow:0 0 6px var(--gold)}
+.s-dim{color:var(--border2)}
+.bc-btn{width:100%;padding:9px;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);margin-top:4px;transition:all .15s}
+.bb-n{background:var(--green);color:#fff}
+.bb-n:hover{background:var(--green2)}
+.bb-p{background:var(--blue);color:#fff}
+.bb-p:hover{background:var(--blue2)}
+.bb-locked{background:var(--bg4);color:var(--text3);border:1px solid var(--border);cursor:not-allowed}
+.bb-again{background:var(--bg4);color:var(--text2);border:1px solid var(--border)}
+.bb-again:hover{border-color:var(--blue);color:var(--blue)}
+
+/* MODAL */
+.mask{position:fixed;inset:0;background:rgba(8,12,24,.88);display:none;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(4px)}
+.mask.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;width:720px;max-width:96vw;max-height:92vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.6);overflow:hidden}
+
+.modal-bar{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0;background:var(--bg3)}
+.mb-rank{font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px}
+.mb-n{background:rgba(30,201,122,.2);color:var(--green);border:1px solid rgba(30,201,122,.3)}
+.mb-p{background:rgba(76,126,245,.2);color:var(--blue);border:1px solid rgba(76,126,245,.3)}
+.mb-h{background:rgba(245,185,66,.2);color:var(--gold);border:1px solid rgba(245,185,66,.3)}
+.mb-title{font-size:15px;font-weight:700;flex:1}
+.mb-timer{font-size:12px;color:var(--text2);background:var(--bg4);border:1px solid var(--border);border-radius:8px;padding:5px 12px;font-family:var(--mono)}
+.mb-close{background:none;border:1px solid var(--border);color:var(--text3);font-size:12px;padding:5px 12px;border-radius:6px;cursor:pointer;font-family:var(--font);transition:all .15s}
+.mb-close:hover{border-color:var(--red);color:var(--red)}
+
+/* STEP RAIL */
+.step-rail{display:flex;align-items:center;padding:14px 24px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg3)}
+.sn{display:flex;flex-direction:column;align-items:center;gap:3px}
+.sn-c{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:2px solid var(--border);color:var(--text3);background:var(--bg);transition:all .3s}
+.sn-c.done{background:var(--green);border-color:var(--green);color:#fff}
+.sn-c.cur{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 0 10px var(--blue-glow)}
+.sn-lbl{font-size:9px;color:var(--text3);white-space:nowrap;text-align:center;line-height:1.3}
+.sn-line{flex:1;height:2px;background:var(--border);margin:0 4px;margin-bottom:14px;transition:background .3s}
+.sn-line.done{background:var(--green)}
+
+/* Q AREA */
+.q-scroll{flex:1;overflow-y:auto;padding:20px 24px}
+.q-scroll::-webkit-scrollbar{width:4px}
+.q-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.q-num{font-size:10px;font-weight:700;color:var(--blue);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.q-txt{font-size:14px;line-height:1.75;color:var(--text);margin-bottom:14px;white-space:pre-line}
+
+/* CONCEPT */
+.concept-box{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:16px;margin-bottom:14px}
+.cb-lbl{font-size:10px;font-weight:700;color:var(--purple);letter-spacing:.07em;text-transform:uppercase;margin-bottom:10px}
+.cb-txt{font-size:13px;color:var(--text2);line-height:1.85;white-space:pre-line}
+.formula{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 16px;font-family:var(--mono);font-size:13px;color:var(--gold);margin-top:10px;line-height:1.8;white-space:pre}
+.dp-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px;font-family:var(--mono)}
+.dp-table th{background:var(--bg4);color:var(--text3);padding:6px 12px;text-align:center;border:1px solid var(--border);font-weight:500}
+.dp-table td{padding:6px 12px;text-align:center;border:1px solid var(--border);color:var(--text)}
+.dp-table tr:nth-child(2) td{background:rgba(76,126,245,.08)}
+
+/* CHOICES */
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.ch-btn{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:11px 14px;font-size:13px;color:var(--text2);cursor:pointer;text-align:left;font-family:var(--font);transition:all .18s;display:flex;align-items:flex-start;gap:8px;line-height:1.5}
+.ch-btn:hover:not(.locked){border-color:var(--blue2);color:var(--text);background:var(--bg4)}
+.ch-btn.chosen{border-color:var(--blue);background:var(--blue-glow);color:var(--text)}
+.ch-btn.correct{border-color:var(--green);background:var(--green-glow);color:var(--green)}
+.ch-btn.wrong{border-color:var(--red);background:var(--red-glow);color:#ff8090}
+.ch-btn.locked{cursor:default}
+.ck{width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;background:var(--bg4);color:var(--text3);border:1px solid var(--border);margin-top:1px;transition:all .18s}
+.ch-btn.chosen .ck{background:var(--blue);color:#fff;border-color:var(--blue)}
+.ch-btn.correct .ck{background:var(--green);color:#fff;border-color:var(--green)}
+.ch-btn.wrong .ck{background:var(--red);color:#fff;border-color:var(--red)}
+
+/* FILL */
+.code-block{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px 18px;font-family:var(--mono);font-size:13px;color:#7dd3fc;line-height:2;margin-bottom:14px;white-space:pre-wrap}
+.blank{display:inline-block;min-width:80px;border-bottom:2px solid var(--gold);padding:0 6px;color:var(--gold);cursor:pointer;border-radius:3px 3px 0 0;text-align:center;transition:all .15s;font-family:var(--mono)}
+.blank:hover{background:var(--gold-glow)}
+.blank.sel{background:rgba(245,185,66,.25);outline:2px solid var(--gold);outline-offset:1px}
+.blank.ok{color:var(--green);border-bottom-color:var(--green)}
+.blank.err{color:var(--red);border-bottom-color:var(--red)}
+.opts-lbl{font-size:11px;color:var(--text3);margin-bottom:7px}
+.opts-pool{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
+.opt{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:5px 13px;font-size:12px;font-family:var(--mono);color:var(--text2);cursor:pointer;transition:all .15s;user-select:none}
+.opt:hover:not(.used){border-color:var(--blue);color:var(--text);background:var(--bg4)}
+.opt.used{opacity:.3;cursor:not-allowed}
+
+/* FEEDBACK */
+.fb{border-radius:8px;padding:11px 14px;font-size:13px;margin-bottom:14px;line-height:1.65;display:none}
+.fb.show{display:block}
+.fb-ok{background:var(--green-glow);border:1px solid rgba(30,201,122,.35);color:#6effc0}
+.fb-err{background:var(--red-glow);border:1px solid rgba(239,79,96,.3);color:#ff9090}
+.fb-tip{background:var(--blue-glow);border:1px solid rgba(76,126,245,.3);color:#9bbeff}
+.fb-hint{background:rgba(155,114,239,.1);border:1px solid rgba(155,114,239,.3);color:#c4a0ff}
+
+/* FOOT */
+.modal-foot{padding:12px 24px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0;background:var(--bg3)}
+.ft-xp-lbl{font-size:11px;color:var(--text3);white-space:nowrap}
+.ft-xp-bar{flex:1;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden}
+.ft-xp-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--blue));border-radius:3px;transition:width .5s}
+.act-btn{padding:9px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s;border:none;white-space:nowrap}
+.ab-pri{background:var(--blue);color:#fff}
+.ab-pri:hover{background:var(--blue2)}
+.ab-pri:disabled{background:var(--bg4);color:var(--text3);cursor:not-allowed}
+.ab-hint{background:var(--bg4);color:var(--text2);border:1px solid var(--border)}
+.ab-hint:hover{border-color:var(--purple);color:var(--purple)}
+
+/* VICTORY */
+.victory{flex:1;display:none;flex-direction:column;align-items:center;justify-content:center;padding:30px 24px;text-align:center}
+.victory.show{display:flex}
+.v-emoji{font-size:56px;margin-bottom:12px;animation:vb .6s ease}
+@keyframes vb{0%{transform:scale(.5);opacity:0}70%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+.v-title{font-size:24px;font-weight:900;margin-bottom:6px;letter-spacing:-.02em}
+.v-sub{font-size:13px;color:var(--text2);margin-bottom:18px}
+.v-stars{display:flex;justify-content:center;gap:14px;margin-bottom:20px}
+.vs{font-size:36px;animation:sp .4s ease forwards;opacity:0}
+.vs.lit{color:var(--gold);text-shadow:0 0 12px var(--gold)}
+.vs.dim{color:var(--border2)}
+@keyframes sp{0%{transform:scale(0) rotate(-30deg);opacity:0}80%{transform:scale(1.2) rotate(5deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+.v-rwds{display:flex;gap:14px;justify-content:center;margin-bottom:24px;flex-wrap:wrap}
+.v-rwd{background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:14px 22px;text-align:center;min-width:100px}
+.v-rwd-val{font-size:22px;font-weight:900;color:var(--gold)}
+.v-rwd-lbl{font-size:11px;color:var(--text3);margin-top:3px}
+.v-btns{display:flex;gap:10px;justify-content:center}
+.vb-sec{background:var(--bg4);color:var(--text2);border:1px solid var(--border);padding:10px 22px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s}
+.vb-sec:hover{border-color:var(--blue2);color:var(--blue)}
+.vb-pri{background:var(--blue);color:#fff;border:none;padding:10px 22px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s}
+.vb-pri:hover{background:var(--blue2)}
+.hidden{display:none!important}
+
+/* 模块标签 */
+.sb-mod-lbl{padding:0;font-size:12px;font-weight:700;color:var(--text2);display:flex;align-items:center;gap:0;cursor:pointer;transition:all .15s;border-left:2px solid transparent;user-select:none}
+.sb-mod-lbl:hover{background:var(--bg3);color:var(--text)}
+.sb-mod-lbl.mod-active{border-left-color:var(--blue);color:var(--text)}
+.sb-mod-lbl-inner{display:flex;align-items:center;gap:8px;padding:10px 14px;flex:1}
+.sb-mod-arrow{font-size:10px;color:var(--text3);transition:transform .2s;margin-right:10px}
+.sb-mod-arrow.open{transform:rotate(90deg)}
+.sb-mod-chapters{overflow:hidden;transition:max-height .25s ease}
+.sb-mod-chapters.collapsed{max-height:0!important}
+.sb-item.sb-coming{opacity:.4;cursor:not-allowed!important}
+/* Loading */
+.loading{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:999}
+.loading-logo{font-size:28px;font-weight:900;color:var(--blue)}
+.loading-bar{width:200px;height:3px;background:var(--bg4);border-radius:2px;overflow:hidden}
+.loading-bar-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--blue));animation:lp .9s ease forwards}
+@keyframes lp{0%{width:0%}100%{width:100%}}
+
+/* DP 填表可视化组件 */
+.viz-wrap{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:14px;margin-bottom:14px}
+.viz-cap-lbl{font-size:10px;font-weight:700;color:var(--teal);letter-spacing:.07em;text-transform:uppercase;margin-bottom:12px}
+.viz-grid-scroll{overflow-x:auto;padding-bottom:4px}
+.viz-grid{border-collapse:separate;border-spacing:5px;margin:0 auto}
+.viz-grid td{padding:0}
+.viz-cell{width:46px;height:40px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;font-family:var(--mono);border:1.5px solid var(--border);background:var(--bg);color:var(--text3);transition:all .25s;position:relative}
+.viz-cell.void{visibility:hidden}
+.viz-cell.filled{background:var(--bg4);color:var(--text);border-color:var(--border2);cursor:pointer}
+.viz-cell.dep{border-color:var(--blue);background:var(--blue-glow);color:#bcd3ff;box-shadow:0 0 0 2px var(--blue-glow)}
+.viz-cell.active{border-color:var(--gold);background:var(--gold-glow);color:var(--gold);box-shadow:0 0 12px var(--gold-glow);transform:scale(1.07);z-index:2}
+.viz-rowlbl,.viz-collbl{font-size:10px;color:var(--text3);font-family:var(--mono);text-align:center;font-weight:500;min-width:28px}
+.viz-caption{margin-top:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:11px 14px;min-height:56px}
+.viz-expr{font-family:var(--mono);font-size:13px;color:var(--gold);line-height:1.7;white-space:pre-wrap}
+.viz-note{font-size:12px;color:var(--text2);margin-top:5px;line-height:1.6}
+.viz-controls{display:flex;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap}
+.viz-btn{background:var(--bg4);border:1px solid var(--border);color:var(--text2);border-radius:7px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s}
+.viz-btn:hover:not(:disabled){border-color:var(--blue);color:var(--blue)}
+.viz-btn:disabled{opacity:.4;cursor:not-allowed}
+.viz-btn.play{background:var(--blue);color:#fff;border-color:var(--blue)}
+.viz-btn.play:hover:not(:disabled){background:var(--blue2)}
+.viz-speed{background:var(--bg4);border:1px solid var(--border);color:var(--text2);border-radius:7px;padding:6px 8px;font-size:11px;font-family:var(--font);cursor:pointer}
+.viz-progress{flex:1;min-width:70px;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden}
+.viz-progress-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--blue));width:0;transition:width .25s}
+.viz-step-txt{font-size:11px;color:var(--text3);font-family:var(--mono);white-space:nowrap}
+.viz-legend{display:flex;gap:14px;margin-top:11px;flex-wrap:wrap}
+.viz-leg{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3)}
+.viz-leg-box{width:13px;height:13px;border-radius:4px;border:1.5px solid var(--border);flex-shrink:0}
+
+/* 游戏化特效 */
+.tb-sound{background:none;border:1px solid var(--border);color:var(--text2);width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .15s;padding:0;font-family:var(--font)}
+.tb-sound:hover{border-color:var(--blue);color:var(--text)}
+.tb-sound.off{opacity:.55}
+@keyframes fxShake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-7px)}40%,60%{transform:translateX(7px)}}
+.fx-shake{animation:fxShake .4s cubic-bezier(.36,.07,.19,.97)}
+
+/* ── TRACE 调用栈 / 逐帧动画组件 ── */
+.trace-wrap{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:14px;margin-bottom:14px}
+.trace-cap-lbl{font-size:10px;font-weight:700;color:var(--purple);letter-spacing:.07em;text-transform:uppercase;margin-bottom:12px}
+
+/* 代码面板 */
+.trace-code{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-family:var(--mono);font-size:12px;line-height:1.9;margin-bottom:10px;overflow-x:auto;white-space:pre}
+.trace-code-line{display:block;padding:0 4px;border-radius:3px;color:var(--text2);transition:all .2s}
+.trace-code-line.hl{background:rgba(245,185,66,.18);color:var(--gold);font-weight:700}
+
+/* 调用栈面板（call_stack mode） */
+.trace-stack{display:flex;flex-direction:column-reverse;gap:5px;margin-bottom:10px;min-height:48px}
+.trace-frame{display:flex;align-items:center;gap:8px;background:var(--bg4);border:1.5px solid var(--border2);border-radius:8px;padding:8px 12px;font-family:var(--mono);font-size:12px;transition:all .25s}
+.trace-frame.active{border-color:var(--blue);background:var(--blue-glow);color:var(--text)}
+.trace-frame.waiting{border-color:var(--border2);color:var(--text3)}
+.trace-frame.returned{border-color:var(--green);background:var(--green-glow);color:var(--green2);opacity:.75}
+.trace-frame-fn{font-weight:700;color:var(--teal);min-width:90px}
+.trace-frame.active .trace-frame-fn{color:var(--blue)}
+.trace-frame.returned .trace-frame-fn{color:var(--green)}
+.trace-frame-args{color:var(--text2);flex:1}
+.trace-frame-state{font-size:10px;padding:2px 7px;border-radius:10px;font-weight:700;white-space:nowrap}
+.fs-active{background:rgba(76,126,245,.2);color:var(--blue)}
+.fs-waiting{background:var(--bg4);color:var(--text3)}
+.fs-returned{background:rgba(30,201,122,.15);color:var(--green2)}
+.trace-frame-ret{font-size:11px;color:var(--green);margin-left:6px}
+
+/* 变量监视区 */
+.trace-vars{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.trace-var{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-family:var(--mono);font-size:11px;color:var(--text2)}
+.trace-var b{color:var(--gold)}
+
+/* 注释面板 */
+.trace-note-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;min-height:44px;margin-bottom:10px}
+.trace-note{font-size:13px;color:var(--text2);line-height:1.7}
+.trace-label{font-size:11px;font-weight:700;color:var(--blue);margin-bottom:4px}
+
+/* 控制条 */
+.trace-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.trace-btn{background:var(--bg4);border:1px solid var(--border);color:var(--text2);border-radius:7px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s}
+.trace-btn:hover:not(:disabled){border-color:var(--purple);color:var(--purple)}
+.trace-btn:disabled{opacity:.4;cursor:not-allowed}
+.trace-btn.play{background:var(--blue);color:#fff;border-color:var(--blue)}
+.trace-btn.play:hover:not(:disabled){background:var(--blue2)}
+.trace-progress{flex:1;min-width:70px;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden}
+.trace-progress-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--blue));width:0;transition:width .25s}
+.trace-step-txt{font-size:11px;color:var(--text3);font-family:var(--mono);white-space:nowrap}
+.trace-stack-lbl{font-size:10px;color:var(--text3);margin-bottom:5px;letter-spacing:.04em;font-weight:600}
+</style>
+</head>
+<body>
+
+<!-- 加载屏 -->
+<div class="loading" id="loading">
+  <div class="loading-logo">⚔ NOIP/CSP</div>
+  <div style="font-size:13px;color:var(--text2)" id="loading-sub">正在加载章节数据...</div>
+  <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+</div>
+
+<!-- 顶栏 -->
+<div class="topbar">
+  <button class="tb-back" onclick="location.href='index.html'">← 返回</button>
+  <div class="tb-bc">
+    <div class="ch" id="tb-mod">信息学竞赛全系列</div>
+    <div class="ls" id="tb-title">加载中...</div>
+  </div>
+  <div class="tb-right">
+    <div class="tb-xp">
+      <span id="xp-text">0</span>
+      <div class="xp-bar"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
+    </div>
+    <button class="tb-sound" id="tb-sound" title="音效开关">🔊</button>
+    <div class="tb-coins"><div class="coin-gem"></div><span id="total-coins">0</span></div>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- 侧边栏 -->
+  <div class="sidebar">
+    <div class="sb-top">
+      <input type="text" placeholder="搜索课时..." oninput="filterSb(this.value)">
+    </div>
+    <div class="sb-list" id="sb-list"></div>
+  </div>
+
+  <!-- 主内容 -->
+  <div class="main" id="main-area">
+    <div class="ls-head">
+      <h2 id="main-title">加载中...</h2>
+      <p id="main-sub">NOIP/CSP · 信息学竞赛全系列</p>
+      <div class="card-badge">📋 完成 <span id="done-count">0</span>/3 关卡</div>
+    </div>
+    <div class="battle-grid" id="battle-grid"></div>
+  </div>
+</div>
+
+<!-- 弹窗 -->
+<div class="mask" id="mask">
+  <div class="modal">
+    <div class="modal-bar">
+      <span class="mb-rank" id="mb-rank">新兵</span>
+      <span class="mb-title" id="mb-title">攀岩对决</span>
+      <span class="mb-timer" id="mb-timer">25:00</span>
+      <button class="mb-close" onclick="closeModal()">✕ 退出</button>
+    </div>
+    <div class="step-rail" id="step-rail"></div>
+    <div class="q-scroll" id="q-scroll"><div id="q-content"></div></div>
+    <div class="victory hidden" id="victory">
+      <div class="v-emoji">🎉</div>
+      <div class="v-title" id="v-title">闯关成功！</div>
+      <div class="v-sub" id="v-sub">你已掌握核心思想</div>
+      <div class="v-stars" id="v-stars"></div>
+      <div class="v-rwds" id="v-rwds"></div>
+      <div class="v-btns">
+        <button class="vb-sec" onclick="closeModal()">← 返回关卡</button>
+        <button class="vb-pri" id="v-next">继续挑战 →</button>
+      </div>
+    </div>
+    <div class="modal-foot" id="modal-foot">
+      <span class="ft-xp-lbl" id="ft-xp-lbl">经验 0%</span>
+      <div class="ft-xp-bar"><div class="ft-xp-fill" id="ft-xp-fill" style="width:0%"></div></div>
+      <button class="act-btn ab-hint hidden" id="btn-hint" onclick="showHint()">💡 提示</button>
+      <button class="act-btn ab-pri" id="btn-confirm" onclick="doConfirm()" disabled>确认答案</button>
+    </div>
+  </div>
+</div>
+
+<script>
+
+// ═══════════════════════════════════════════════════════════════
+// 29章注册表 ── 唯一需要维护的地方
+// 新增章节：在 MODS 对应模块的 chapters 加 id，
+//           在 CH 加一条记录，file 字段指向 data/xx_yy.js
+// ═══════════════════════════════════════════════════════════════
+const MODS = [
+  {key:'s0', label:'专题一 · 递归与搜索', chapters:['recursion','dfs_basic','dfs_advanced','bfs_basic','bfs_advanced','backtrack']},
+  {key:'m1', label:'专题二 · 动态规划引入',      chapters:['fib','triangle']},
+  {key:'m2', label:'专题三 · 线性DP',    chapters:['grid_dp','linear_dp','maxsubarray','lis','lcs','edit_dist']},
+  {key:'m3', label:'专题四 · 背包DP',    chapters:['knapsack','complete_pack','multi_pack','group_pack','pack_var']},
+  {key:'m4', label:'专题五 · 区间DP',    chapters:['interval_basic','interval_circle','interval_palindrome','interval_score']},
+  {key:'m5', label:'专题六 · 树形DP',    chapters:['tree_basic','tree_diameter','tree_pack','tree_reroot']},
+  {key:'m6', label:'专题七 · 状态压缩',  chapters:['bit_intro','statecomp_board','statecomp_tsp','statecomp_adv']},
+  {key:'m7', label:'专题八 · 特殊DP',    chapters:['digit_basic','digit_adv','prob_dp','expect_dp']},
+];
+
+const CH = {
+  // ── 专题一：递归与搜索 ──
+  recursion:    {n:'S01', t:'S01.递归基础',            pre:[],              file:'data/s01_recursion.js'},
+  dfs_basic:    {n:'S02', t:'S02.DFS上：树与迷宫',     pre:['recursion'],   file:'data/s02_dfs_basic.js'},
+  dfs_advanced: {n:'S03', t:'S03.DFS下：图与连通性',   pre:['dfs_basic'],   file:'data/s03_dfs_advanced.js'},
+  bfs_basic:    {n:'S04', t:'S04.BFS上：基础与最短路', pre:['recursion'],   file:'data/s04_bfs_basic.js'},
+  bfs_advanced: {n:'S05', t:'S05.BFS下：进阶应用',     pre:['bfs_basic'],   file:'data/s05_bfs_advanced.js'},
+  backtrack:    {n:'S06', t:'S06.回溯与剪枝',          pre:['dfs_basic'],   file:'data/s06_backtrack.js'},
+  // ── 专题二：动态规划引入 ──
+  fib:          {n:'01', t:'01.斐波那契与记忆化搜索',  pre:[],              file:'data/01_fib.js',          coming:0},
+  triangle:     {n:'02', t:'02.数字三角形',             pre:['fib'],         file:'data/02_triangle.js',     coming:0},
+  // ── 模块二 ──
+  grid_dp:      {n:'03', t:'03.位置型网格DP',           pre:['triangle'],    file:'data/03_grid_dp.js',      coming:0},
+  linear_dp:    {n:'04', t:'04.一维线性DP基础',         pre:['grid_dp'],     file:'data/04_linear_dp.js',    coming:0},
+  maxsubarray:  {n:'05', t:'05.最大连续子段和',         pre:['linear_dp'],   file:'data/05_maxsubarray.js',  coming:0},
+  lis:          {n:'06', t:'06.LIS专题',                pre:['maxsubarray'], file:'data/06_lis.js',          coming:0},
+  lcs:          {n:'07', t:'07.LCS专题',                pre:['lis'],         file:'data/07_lcs.js',          coming:0},
+  edit_dist:    {n:'08', t:'08.编辑距离',               pre:['lcs'],         file:'data/08_edit_dist.js',    coming:0},
+  // ── 模块三 ──
+  knapsack:     {n:'09', t:'09.0/1背包',                pre:['linear_dp'],   file:'data/09_knapsack.js',     coming:0},
+  complete_pack:{n:'10', t:'10.完全背包',               pre:['knapsack'],    file:'data/10_complete_pack.js',coming:0},
+  multi_pack:   {n:'11', t:'11.多重背包与二进制优化',   pre:['complete_pack'],file:'data/11_multi_pack.js',  coming:0},
+  group_pack:   {n:'12', t:'12.分组背包',               pre:['multi_pack'],  file:'data/12_group_pack.js',   coming:0},
+  pack_var:     {n:'13', t:'13.背包模型变形',           pre:['group_pack'],  file:'data/13_pack_var.js',     coming:0},
+  // ── 模块四 ──
+  interval_basic:      {n:'14', t:'14.区间DP入门',         pre:['lcs'],                   file:'data/14_interval_basic.js',      coming:0},
+  interval_circle:     {n:'15', t:'15.环形区间DP',         pre:['interval_basic'],        file:'data/15_interval_circle.js',     coming:0},
+  interval_palindrome: {n:'16', t:'16.回文型区间DP',       pre:['interval_circle'],       file:'data/16_interval_palindrome.js', coming:0},
+  interval_score:      {n:'17', t:'17.区间DP得分变形',     pre:['interval_palindrome'],   file:'data/17_interval_score.js',      coming:0},
+  // ── 模块五 ──
+  tree_basic:   {n:'18', t:'18.树形DP基础',             pre:['lcs'],         file:'data/18_tree_basic.js',   coming:0},
+  tree_diameter:{n:'19', t:'19.树的直径',               pre:['tree_basic'],  file:'data/19_tree_diameter.js',coming:0},
+  tree_pack:    {n:'20', t:'20.树上背包',               pre:['tree_diameter'],file:'data/20_tree_pack.js',   coming:0},
+  tree_reroot:  {n:'21', t:'21.换根DP',                 pre:['tree_pack'],   file:'data/21_tree_reroot.js',  coming:0},
+  // ── 模块六 ──
+  bit_intro:       {n:'22', t:'22.二进制位运算基础',    pre:['knapsack'],        file:'data/22_bit_intro.js',       coming:0},
+  statecomp_board: {n:'23', t:'23.棋盘类状压DP',        pre:['bit_intro'],       file:'data/23_statecomp_board.js', coming:0},
+  statecomp_tsp:   {n:'24', t:'24.集合类状压·TSP',     pre:['statecomp_board'], file:'data/24_statecomp_tsp.js',   coming:0},
+  statecomp_adv:   {n:'25', t:'25.状压DP综合',          pre:['statecomp_tsp'],   file:'data/25_statecomp_adv.js',   coming:0},
+  // ── 模块七 ──
+  digit_basic:  {n:'26', t:'26.数位DP基础',             pre:['linear_dp'],   file:'data/26_digit_basic.js',  coming:0},
+  digit_adv:    {n:'27', t:'27.数位DP进阶',             pre:['digit_basic'], file:'data/27_digit_adv.js',    coming:0},
+  prob_dp:      {n:'28', t:'28.概率DP',                 pre:['linear_dp'],   file:'data/28_prob_dp.js',      coming:0},
+  expect_dp:    {n:'29', t:'29.期望DP',                 pre:['prob_dp'],     file:'data/29_expect_dp.js',    coming:0},
+};
+
+
+// ═══════════════════════════════════════════════════════════════
+// 本地持久化
+// ═══════════════════════════════════════════════════════════════
+const STORE_KEY = 'dpquest_v1';
+function loadProgress(){
+  try{ return JSON.parse(localStorage.getItem(STORE_KEY))||{coins:0,xp:0,done:{}}; }
+  catch{ return {coins:0,xp:0,done:{}}; }
+}
+function saveProgress(st){
+  localStorage.setItem(STORE_KEY, JSON.stringify({coins:st.coins,xp:st.xp,done:st.done}));
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 侧边栏（7模块全展开，当前章高亮，序号前缀）
+// ═══════════════════════════════════════════════════════════════
+function renderSidebar(currentId){
+  const prog = loadProgress();
+  const list = document.getElementById('sb-list');
+  list.innerHTML = '';
+
+  MODS.forEach(mod => {
+    // 判断当前章节是否在此模块
+    const isCurrentMod = mod.chapters.includes(currentId);
+    // 完成数
+    const doneCount = mod.chapters.filter(id=>prog.done[id]&&Object.keys(prog.done[id]).length>0).length;
+
+    // 模块标题行
+    const modRow = document.createElement('div');
+    modRow.className = 'sb-mod-lbl' + (isCurrentMod?' mod-active':'');
+    modRow.innerHTML = `
+      <div class="sb-mod-lbl-inner">
+        <span>${mod.label}</span>
+        <span style="margin-left:auto;font-size:10px;color:var(--text3);font-weight:400">${doneCount}/${mod.chapters.length}</span>
+      </div>
+      <span class="sb-mod-arrow ${isCurrentMod?'open':''}">▶</span>`;
+
+    // 章节容器
+    const chapWrap = document.createElement('div');
+    chapWrap.className = 'sb-mod-chapters' + (isCurrentMod?'':' collapsed');
+
+    mod.chapters.forEach(id => {
+      const c = CH[id]; if(!c) return;
+      const isActive  = id === currentId;
+      const isDone    = prog.done[id] && Object.keys(prog.done[id]).length > 0;
+      const isComing  = !!c.coming;
+      const doneRanks = prog.done[id] ? Object.keys(prog.done[id]).length : 0;
+      let cls = 'sb-item' + (isActive?' active':isDone?' done':'') + (isComing?' sb-coming':'');
+      const iconCls = isActive?'ic-act':isDone?'ic-done':'ic-num';
+      const iconTxt = isDone&&!isActive?'✓':c.n;
+      const item = document.createElement('div');
+      item.className = cls;
+      item.innerHTML = `<div class="sb-ic ${iconCls}">${iconTxt}</div>${c.t}<span class="sb-c">${isComing?'—':doneRanks+'/3'}</span>`;
+      if(!isComing) item.addEventListener('click',()=>location.href='lesson.html?id='+id);
+      chapWrap.appendChild(item);
+    });
+
+    // 点击模块标题折叠/展开
+    modRow.addEventListener('click', ()=>{
+      const isOpen = !chapWrap.classList.contains('collapsed');
+      if(isOpen){
+        chapWrap.classList.add('collapsed');
+        modRow.querySelector('.sb-mod-arrow').classList.remove('open');
+      } else {
+        chapWrap.classList.remove('collapsed');
+        modRow.querySelector('.sb-mod-arrow').classList.add('open');
+      }
+    });
+
+    // 展开时设置 max-height
+    if(isCurrentMod){
+      chapWrap.style.maxHeight = mod.chapters.length * 42 + 'px';
+    }
+    // 监听展开动画
+    chapWrap.addEventListener('transitionend', ()=>{
+      if(!chapWrap.classList.contains('collapsed')){
+        chapWrap.style.maxHeight = chapWrap.scrollHeight + 'px';
+      }
+    });
+    const obs = new MutationObserver(()=>{
+      if(!chapWrap.classList.contains('collapsed')){
+        chapWrap.style.maxHeight = chapWrap.scrollHeight + 'px';
+      } else {
+        chapWrap.style.maxHeight = '0px';
+      }
+    });
+    obs.observe(chapWrap, {attributes:true, attributeFilter:['class']});
+
+    list.appendChild(modRow);
+    list.appendChild(chapWrap);
+  });
+}
+
+function filterSb(q){
+  const ql = q.toLowerCase();
+  document.querySelectorAll('#sb-list .sb-item').forEach(el=>{
+    el.style.display=(!q||el.textContent.toLowerCase().includes(ql))?'':'none';
+  });
+  document.querySelectorAll('#sb-list .sb-mod-lbl').forEach(el=>{
+    el.style.display=q?'none':'';
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 三张关卡卡片
+// ═══════════════════════════════════════════════════════════════
+function renderBattleCards(battles, done){
+  const grid = document.getElementById('battle-grid');
+  const cfg = {
+    new: {pill:'rp-n',led:'led-n',pf:'pf-n',bb:'bb-n',lbl:'新兵'},
+    pro: {pill:'rp-p',led:'led-p',pf:'pf-p',bb:'bb-p',lbl:'锐士'},
+    hero:{pill:'rp-h',led:'led-h',pf:'pf-h',bb:'bb-hero',lbl:'英雄'},
+  };
+  grid.innerHTML='';
+  ['new','pro','hero'].forEach(rank=>{
+    const b=battles[rank]; if(!b) return;
+    const r=cfg[rank];
+    const st=done[rank]||0;
+    const starH=[...Array(3)].map((_,i)=>`<span class="star ${i<st?'s-lit':'s-dim'}">${i<st?'★':'☆'}</span>`).join('');
+    const pct=done[rank]?'100':'0';
+    grid.innerHTML+=`
+      <div class="bc bc-${rank}" id="card-${rank}">
+        <div class="bc-hd">
+          <span class="rank-pill ${r.pill}">⚔ ${r.lbl}</span>
+          <span class="bc-name">攀岩对决（${r.lbl}）</span>
+          <span class="bc-sc"><b id="sc-${rank}">${done[rank]?1:0}</b>/1</span>
+        </div>
+        <div class="bc-bd">
+          <div class="bc-timer"><div class="t-led ${r.led}"></div>25 分钟</div>
+          <div class="bc-pgbar"><div class="bc-pgfill ${r.pf}" id="pg-${rank}" style="width:${pct}%"></div></div>
+          <div class="bc-rwds">
+            <div class="rwd-line">🏆 胜利奖励：<span class="rwd-tag">精灵币 ×${b.coins||50}</span></div>
+            <div class="rwd-line">⭐ 首次通关：<span class="rwd-tag">经验 +${b.xp||120}</span></div>
+          </div>
+          <div class="star-row" id="stars-${rank}">${starH}</div>
+          <button class="bc-btn ${r.bb}" id="btn-${rank}" onclick="openBattle('${rank}')">${done[rank]?'再来一次':'开始学习'}</button>
+        </div>
+      </div>`;
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 初始化：URL ?id=xxx → import data/xx_xxx.js
+// ═══════════════════════════════════════════════════════════════
+let DATA = null;
+let CURRENT_ID = '';
+
+async function init(){
+  const id = new URLSearchParams(location.search).get('id');
+  if(!id){ location.href='index.html'; return; }
+
+  const chap = CH[id];
+  if(!chap){
+    document.getElementById('loading-sub').innerHTML=
+      `<span style="color:var(--red)">❌ 章节 "${id}" 未在注册表中<br><a href="index.html" style="color:var(--blue)">返回首页</a></span>`;
+    return;
+  }
+  if(chap.coming){
+    document.getElementById('loading-sub').innerHTML=
+      `<span style="color:var(--text2)">🛠 该章节正在开发中<br><a href="index.html" style="color:var(--blue)">返回首页</a></span>`;
+    return;
+  }
+
+  CURRENT_ID = id;
+  try{
+    const mod = await import('./'+chap.file);
+    DATA = mod.LESSON.battles;
+
+    const modName = MODS.find(m=>m.chapters.includes(id))?.label||'动态规划';
+    document.title = 'NOIP/CSP · '+chap.t;
+    document.getElementById('tb-mod').textContent = modName;
+    document.getElementById('tb-title').textContent = chap.t;
+    document.getElementById('main-title').textContent = chap.t;
+    document.getElementById('main-sub').textContent = 'NOIP/CSP · '+modName;
+
+    const prog = loadProgress();
+    S.coins = prog.coins||0;
+    S.xp    = prog.xp||0;
+    S.done  = prog.done[id]?{...prog.done[id]}:{};
+
+    document.getElementById('total-coins').textContent = S.coins;
+    document.getElementById('xp-text').textContent = S.xp;
+    document.getElementById('xp-fill').style.width = Math.min(100,Math.round(S.xp/2000*100))+'%';
+
+    renderSidebar(id);
+    renderBattleCards(DATA, S.done);
+    document.getElementById('done-count').textContent = Object.keys(S.done).length;
+    document.getElementById('loading').style.display = 'none';
+
+  }catch(e){
+    console.error(e);
+    document.getElementById('loading-sub').innerHTML=
+      `<span style="color:var(--red)">❌ 加载失败：${chap.file}<br><small>${e.message}</small><br><a href="index.html" style="color:var(--blue)">返回首页</a></span>`;
+  }
+}
+
+init();
+
+// STATE
+let S={coins:0,done:{},cur:null,step:0,answers:{},filled:{},selBlank:null,chosen:undefined,wrongs:0,timerSec:1500,timerInt:null};
+
+// ═══════════════════════════════════════════════════════════════
+// TRACE 逐帧动画组件（搜索专题专用：call_stack / tree / graph / grid）
+//   在 steps[] 加：{ type:'trace', lbl:'看执行', title:'...', body:'...',
+//     trace:{ caption:'...', mode:'call_stack', intro:'...', code:`...`,
+//             frames:[{ id, label, note, code_line, stack, ret, vars }, ...] } }
+// ═══════════════════════════════════════════════════════════════
+let TRACE = null;
+
+function traceBuildHTML(tr) {
+  const hasCode = !!(tr.code);
+  return `
+  <div class="trace-wrap">
+    <div class="trace-cap-lbl">🎬 ${tr.caption||'执行过程演示'}</div>
+    ${hasCode ? `<div class="trace-code" id="trace-code-host"></div>` : ''}
+    <div class="trace-stack-lbl">调用栈（栈顶在上）</div>
+    <div class="trace-stack" id="trace-stack-host"></div>
+    <div class="trace-vars" id="trace-vars-host"></div>
+    <div class="trace-note-box">
+      <div class="trace-label" id="trace-frame-label"></div>
+      <div class="trace-note" id="trace-note-host"></div>
+    </div>
+    <div class="trace-controls">
+      <button class="trace-btn play" id="trace-play">▶ 播放</button>
+      <button class="trace-btn" id="trace-prev">◀ 上一帧</button>
+      <button class="trace-btn" id="trace-next">下一帧 ▶</button>
+      <button class="trace-btn" id="trace-reset">↺ 重置</button>
+      <div class="trace-progress"><div class="trace-progress-fill" id="trace-progress-fill"></div></div>
+      <span class="trace-step-txt" id="trace-step-txt">0 / 0</span>
+    </div>
+  </div>`;
+}
+
+function mountTrace(tr) {
+  if (TRACE && TRACE.timer) { clearInterval(TRACE.timer); }
+  TRACE = { tr, frame: 0, playing: false, timer: null, speed: 900 };
+  document.getElementById('trace-play').onclick  = traceTogglePlay;
+  document.getElementById('trace-next').onclick  = () => traceStep(1);
+  document.getElementById('trace-prev').onclick  = () => traceStep(-1);
+  document.getElementById('trace-reset').onclick = traceReset;
+  traceRender();
+}
+
+function traceRender() {
+  const { tr, frame } = TRACE;
+  const frames = tr.frames;
+  const n = frames.length;
+  const f = frame > 0 ? frames[frame - 1] : null;   // 当前显示帧（frame=0 时显示 intro）
+
+  // ── 代码面板 ──
+  const codeHost = document.getElementById('trace-code-host');
+  if (codeHost && tr.code) {
+    const lines = tr.code.split('\n');
+    const hl = f ? (f.code_line || 0) : 0;
+    codeHost.innerHTML = lines.map((ln, i) =>
+      `<span class="trace-code-line${(i+1)===hl?' hl':''}">${ln.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</span>`
+    ).join('\n');
+  }
+
+  // ── 调用栈（call_stack mode）──
+  const stackHost = document.getElementById('trace-stack-host');
+  if (stackHost) {
+    if (!f) {
+      stackHost.innerHTML = `<div style="font-size:12px;color:var(--text3);padding:8px">${tr.intro||'点击 ▶ 开始逐帧观察'}</div>`;
+    } else if (f.stack && f.stack.length) {
+      // 栈顶在最后 → 渲染时反转使栈顶在上
+      const reversed = [...f.stack].reverse();
+      stackHost.innerHTML = reversed.map(sf => {
+        const stateCls = sf.state==='active'?'active':sf.state==='returned'?'returned':'waiting';
+        const stateTag = sf.state==='active'?'执行中':sf.state==='returned'?'已返回':'等待中';
+        const stateTagCls = sf.state==='active'?'fs-active':sf.state==='returned'?'fs-returned':'fs-waiting';
+        const argsStr = Object.entries(sf.args||{}).map(([k,v])=>`${k}=${v}`).join(', ');
+        const retStr  = (sf.state==='returned' && f.ret != null) ? ` → ${f.ret}` : '';
+        return `<div class="trace-frame ${stateCls}">
+          <span class="trace-frame-fn">${sf.fn}(${argsStr})</span>
+          <span class="trace-frame-state ${stateTagCls}">${stateTag}</span>
+          ${retStr?`<span class="trace-frame-ret">↩ ${retStr}</span>`:''}
+        </div>`;
+      }).join('');
+    } else {
+      stackHost.innerHTML = `<div style="font-size:12px;color:var(--text3);padding:8px">调用栈已清空</div>`;
+    }
+  }
+
+  // ── 变量监视 ──
+  const varsHost = document.getElementById('trace-vars-host');
+  if (varsHost) {
+    if (f && f.vars && Object.keys(f.vars).length) {
+      varsHost.innerHTML = Object.entries(f.vars).map(([k,v])=>
+        `<span class="trace-var"><b>${k}</b> = ${v}</span>`
+      ).join('');
+    } else {
+      varsHost.innerHTML = '';
+    }
+  }
+
+  // ── 注释 ──
+  document.getElementById('trace-frame-label').textContent = f ? (f.label||'') : '准备开始';
+  document.getElementById('trace-note-host').textContent   = f ? (f.note||'') : (tr.intro||'');
+
+  // ── 进度 ──
+  document.getElementById('trace-progress-fill').style.width = Math.round(frame/n*100)+'%';
+  document.getElementById('trace-step-txt').textContent = frame+' / '+n;
+  document.getElementById('trace-prev').disabled = frame <= 0;
+  document.getElementById('trace-next').disabled = frame >= n;
+  document.getElementById('trace-play').textContent = TRACE.playing ? '⏸ 暂停' : (frame>=n?'↺ 重放':'▶ 播放');
+}
+
+function traceStep(d) {
+  TRACE.frame = Math.max(0, Math.min(TRACE.tr.frames.length, TRACE.frame + d));
+  traceRender();
+}
+function traceReset() { tracePause(); TRACE.frame=0; traceRender(); }
+function tracePause() { TRACE.playing=false; if(TRACE.timer){clearInterval(TRACE.timer);TRACE.timer=null;} }
+function tracePlay() {
+  if (TRACE.frame >= TRACE.tr.frames.length) TRACE.frame = 0;
+  TRACE.playing = true;
+  TRACE.timer = setInterval(()=>{
+    if (TRACE.frame >= TRACE.tr.frames.length) { tracePause(); traceRender(); return; }
+    TRACE.frame++; traceRender();
+  }, TRACE.speed);
+  traceRender();
+}
+function traceTogglePlay() { if(TRACE.playing){tracePause();traceRender();}else{tracePlay();} }
+
+// ═══════════════════════════════════════════════════════════════
+// DP 填表动态可视化组件（数据驱动，可复用）
+//   在某关 steps[] 里加一条：
+//   { type:'viz', lbl:'看填表', title:'...', body:'可选引言',
+//     viz:{ caption:'...', rows:R, cols:C,
+//           rowLabels:[...], colLabels:[...],   // 可选
+//           intro:'可选首屏提示',
+//           cells:[                              // 按填表顺序排列
+//             {r,c,val, from:[[r2,c2],...], expr:'dp[..]=..', note:'可选'}, ...
+//           ] } }
+//   未在 cells 出现的 (r,c) 会渲染成空白（自动支持三角形等非满矩形）。
+// ═══════════════════════════════════════════════════════════════
+let VIZ=null;
+const VK=(r,c)=>r+'_'+c;
+
+function vizBuildHTML(viz){
+  return `
+  <div class="viz-wrap">
+    <div class="viz-cap-lbl">🎬 ${viz.caption||'DP 填表过程演示'}</div>
+    <div class="viz-grid-scroll"><div id="viz-grid-host"></div></div>
+    <div class="viz-caption" id="viz-caption"></div>
+    <div class="viz-controls">
+      <button class="viz-btn play" id="viz-play">▶ 播放</button>
+      <button class="viz-btn" id="viz-prev">◀ 上一步</button>
+      <button class="viz-btn" id="viz-next">下一步 ▶</button>
+      <button class="viz-btn" id="viz-reset">↺ 重置</button>
+      <select class="viz-speed" id="viz-speed">
+        <option value="1400">0.5×</option>
+        <option value="900" selected>1×</option>
+        <option value="500">2×</option>
+        <option value="250">4×</option>
+      </select>
+      <div class="viz-progress"><div class="viz-progress-fill" id="viz-progress-fill"></div></div>
+      <span class="viz-step-txt" id="viz-step-txt">0 / 0</span>
+    </div>
+    <div class="viz-legend">
+      <div class="viz-leg"><span class="viz-leg-box" style="border-color:var(--gold);background:var(--gold-glow)"></span>当前格</div>
+      <div class="viz-leg"><span class="viz-leg-box" style="border-color:var(--blue);background:var(--blue-glow)"></span>转移来源</div>
+      <div class="viz-leg"><span class="viz-leg-box" style="background:var(--bg4);border-color:var(--border2)"></span>已填（点击回看来源）</div>
+    </div>
+  </div>`;
+}
+
+function mountViz(viz){
+  if(VIZ&&VIZ.timer)clearInterval(VIZ.timer);
+  VIZ={viz,frame:0,playing:false,timer:null,speed:900,inspect:null};
+  const sp=document.getElementById('viz-speed');if(sp)VIZ.speed=+sp.value;
+  document.getElementById('viz-play').onclick=vizTogglePlay;
+  document.getElementById('viz-next').onclick=()=>vizStep(1);
+  document.getElementById('viz-prev').onclick=()=>vizStep(-1);
+  document.getElementById('viz-reset').onclick=vizReset;
+  document.getElementById('viz-speed').onchange=function(){VIZ.speed=+this.value;if(VIZ.playing){vizPause();vizPlay();}};
+  vizRender();
+}
+
+function vizActiveIdx(){
+  if(VIZ.inspect!=null)return VIZ.inspect;
+  return VIZ.frame>=1?VIZ.frame-1:-1;
+}
+
+function vizRender(){
+  const {viz,frame}=VIZ;
+  const cells=viz.cells;const n=cells.length;
+  let rows=viz.rows,cols=viz.cols;
+  if(!rows||!cols){let mr=0,mc=0;cells.forEach(c=>{mr=Math.max(mr,c.r);mc=Math.max(mc,c.c);});rows=rows||mr+1;cols=cols||mc+1;}
+  const map={};cells.forEach((c,i)=>{map[VK(c.r,c.c)]={idx:i,cell:c};});
+  const ai=vizActiveIdx();
+  const act=ai>=0?cells[ai]:null;
+  const dep=new Set((act&&act.from?act.from:[]).map(([r,c])=>VK(r,c)));
+
+  let h='<table class="viz-grid"><tbody>';
+  if(viz.colLabels){
+    h+='<tr>'+(viz.rowLabels?'<td></td>':'');
+    for(let c=0;c<cols;c++)h+=`<td class="viz-collbl">${viz.colLabels[c]??c}</td>`;
+    h+='</tr>';
+  }
+  for(let r=0;r<rows;r++){
+    h+='<tr>';
+    if(viz.rowLabels)h+=`<td class="viz-rowlbl">${viz.rowLabels[r]??r}</td>`;
+    for(let c=0;c<cols;c++){
+      const m=map[VK(r,c)];
+      if(!m){h+='<td><div class="viz-cell void"></div></td>';continue;}
+      const revealed=m.idx<frame;
+      let cls='viz-cell';
+      if(revealed)cls+=' filled';
+      if(revealed&&dep.has(VK(r,c)))cls+=' dep';
+      if(ai===m.idx&&revealed)cls+=' active';
+      h+=`<td><div class="${cls}" data-idx="${m.idx}">${revealed?m.cell.val:''}</div></td>`;
+    }
+    h+='</tr>';
+  }
+  h+='</tbody></table>';
+  document.getElementById('viz-grid-host').innerHTML=h;
+
+  let cap;
+  if(act&&ai<frame){
+    cap=`<div class="viz-expr">${act.expr||''}</div>`+(act.note?`<div class="viz-note">${act.note}</div>`:'');
+  }else{
+    cap=`<div class="viz-note">${viz.intro||'点击 ▶ 播放，观察 dp 表如何从边界条件逐格递推填满；点任意已填格子可回看它由哪些格子转移而来。'}</div>`;
+  }
+  document.getElementById('viz-caption').innerHTML=cap;
+
+  document.getElementById('viz-progress-fill').style.width=Math.round(frame/n*100)+'%';
+  document.getElementById('viz-step-txt').textContent=frame+' / '+n;
+  document.getElementById('viz-prev').disabled=(frame<=0&&VIZ.inspect==null);
+  document.getElementById('viz-next').disabled=frame>=n;
+  document.getElementById('viz-play').textContent=VIZ.playing?'⏸ 暂停':(frame>=n?'↺ 重放':'▶ 播放');
+
+  document.getElementById('viz-grid-host').querySelectorAll('.viz-cell.filled').forEach(el=>{
+    el.onclick=()=>{const i=+el.dataset.idx;vizPause();VIZ.inspect=(VIZ.inspect===i?null:i);vizRender();};
+  });
+}
+
+function vizStep(d){VIZ.inspect=null;VIZ.frame=Math.max(0,Math.min(VIZ.viz.cells.length,VIZ.frame+d));vizRender();}
+function vizReset(){vizPause();VIZ.inspect=null;VIZ.frame=0;vizRender();}
+function vizPause(){VIZ.playing=false;if(VIZ.timer){clearInterval(VIZ.timer);VIZ.timer=null;}}
+function vizPlay(){
+  if(VIZ.frame>=VIZ.viz.cells.length)VIZ.frame=0;
+  VIZ.inspect=null;VIZ.playing=true;
+  VIZ.timer=setInterval(()=>{
+    if(VIZ.frame>=VIZ.viz.cells.length){vizPause();vizRender();return;}
+    VIZ.frame++;vizRender();
+  },VIZ.speed);
+  vizRender();
+}
+function vizTogglePlay(){if(VIZ.playing){vizPause();vizRender();}else{vizPlay();}}
+
+// ═══════════════════════════════════════════════════════════════
+// 游戏化特效（自包含：Web Audio 合成音效 + Canvas 粒子 + 四级反馈）
+//   外部只需调用 FX.correct() / FX.wrong() / FX.levelClear() / FX.perfectClear()
+//   无外部依赖、无音频文件、无 CDN；尊重 prefers-reduced-motion；低端机自动减粒子。
+// ═══════════════════════════════════════════════════════════════
+const FX=(()=>{
+  const reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const lowEnd = (navigator.hardwareConcurrency||4) <= 4;   // 粗判低端机
+  const CAP    = reduce ? 0 : (lowEnd ? 70 : 150);          // 粒子总量上限
+
+  // ── 音效开关（持久化）──
+  let soundOn = (localStorage.getItem('dpquest_sound')!=='off');
+  const setSound=on=>{soundOn=on;try{localStorage.setItem('dpquest_sound',on?'on':'off');}catch(e){}};
+  const isSoundOn=()=>soundOn;
+
+  // ── Web Audio 合成 ──
+  let ac=null;
+  function ctx(){
+    if(!ac){try{ac=new (window.AudioContext||window.webkitAudioContext)();}catch(e){return null;}}
+    if(ac.state==='suspended')ac.resume();
+    return ac;
+  }
+  function tone(freq,dur,type='sine',vol=0.18,delay=0){
+    if(!soundOn)return;
+    const c=ctx();if(!c)return;
+    const t=c.currentTime+delay;
+    const o=c.createOscillator(),g=c.createGain();
+    o.type=type;o.frequency.setValueAtTime(freq,t);
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.linearRampToValueAtTime(vol,t+0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    o.connect(g).connect(c.destination);
+    o.start(t);o.stop(t+dur+0.03);
+  }
+  const SND={
+    correct(){tone(880,0.12,'triangle',0.16);tone(1320,0.16,'triangle',0.14,0.07);},
+    wrong(){tone(180,0.18,'sawtooth',0.12);tone(150,0.20,'sawtooth',0.10,0.04);},
+    levelClear(){[[523,.18,0],[659,.18,.12],[784,.28,.24]].forEach(([f,d,dl])=>tone(f,d,'triangle',0.15,dl));},
+    perfectClear(){[[523,.16,0],[659,.16,.11],[784,.16,.22],[1046,.40,.34]].forEach(([f,d,dl])=>tone(f,d,'triangle',0.17,dl));tone(1568,0.5,'sine',0.09,0.40);},
+  };
+
+  // ── Canvas 粒子 ──
+  let cv=null,g=null,parts=[],raf=null;
+  function ensureCanvas(){
+    if(cv)return;
+    cv=document.createElement('canvas');
+    cv.style.cssText='position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9999';
+    document.body.appendChild(cv);
+    g=cv.getContext('2d');resize();window.addEventListener('resize',resize);
+  }
+  function resize(){if(!cv)return;const d=window.devicePixelRatio||1;cv.width=innerWidth*d;cv.height=innerHeight*d;if(g)g.setTransform(d,0,0,d,0,0);}
+  function star(s,color){
+    g.fillStyle=color;g.beginPath();
+    for(let i=0;i<10;i++){const r=(i%2===0)?s:s*0.45;const a=(Math.PI/5)*i-Math.PI/2;g[i===0?'moveTo':'lineTo'](Math.cos(a)*r,Math.sin(a)*r);}
+    g.closePath();g.fill();
+  }
+  function tick(){
+    raf=requestAnimationFrame(tick);
+    g.clearRect(0,0,innerWidth,innerHeight);
+    for(let i=parts.length-1;i>=0;i--){
+      const p=parts[i];
+      p.vy+=p.g;p.x+=p.vx;p.y+=p.vy;p.life--;p.rot+=p.vr;
+      g.save();g.globalAlpha=Math.max(0,p.life/p.life0);g.translate(p.x,p.y);g.rotate(p.rot);
+      if(p.kind==='coin'){g.fillStyle=p.c;g.beginPath();g.arc(0,0,p.s,0,7);g.fill();g.fillStyle='rgba(255,255,255,.55)';g.beginPath();g.arc(-p.s*0.3,-p.s*0.3,p.s*0.32,0,7);g.fill();}
+      else if(p.kind==='star'){star(p.s,p.c);}
+      else{g.fillStyle=p.c;g.fillRect(-p.s/2,-p.s/2,p.s,p.s*0.6);}
+      g.restore();
+      if(p.life<=0||p.y>innerHeight+50)parts.splice(i,1);
+    }
+    if(parts.length===0){cancelAnimationFrame(raf);raf=null;}
+  }
+  function spawn(arr){
+    if(reduce||CAP===0)return;
+    ensureCanvas();
+    for(const p of arr){p.life0=p.life;parts.push(p);}
+    if(parts.length>CAP)parts.splice(0,parts.length-CAP);
+    if(!raf)tick();
+  }
+  function coinBurst(x,y,n=16){
+    const cs=['#f5b942','#ffd27a','#e0a030'],arr=[];
+    for(let i=0;i<n;i++){const a=Math.random()*6.28,sp=2+Math.random()*5;
+      arr.push({kind:'coin',x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-3,g:0.18,s:4+Math.random()*4,c:cs[i%3],life:50+Math.random()*25,rot:0,vr:(Math.random()-.5)*.3});}
+    spawn(arr);
+  }
+  function confetti(n=70){
+    const cs=['#4c7ef5','#1ec97a','#f5b942','#9b72ef','#22d4c0','#ef4f60'],arr=[];
+    for(let i=0;i<n;i++)arr.push({kind:'confetti',x:Math.random()*innerWidth,y:-20-Math.random()*60,vx:(Math.random()-.5)*3,vy:1+Math.random()*2,g:0.05,s:7+Math.random()*6,c:cs[i%cs.length],life:120+Math.random()*60,rot:Math.random()*6,vr:(Math.random()-.5)*.25});
+    spawn(arr);
+  }
+  function starShower(n=46){
+    const cs=['#f5b942','#ffd27a','#fff0c0'],arr=[];
+    for(let i=0;i<n;i++)arr.push({kind:'star',x:Math.random()*innerWidth,y:-20-Math.random()*innerHeight*0.5,vx:(Math.random()-.5)*2,vy:1.5+Math.random()*2.5,g:0.04,s:6+Math.random()*8,c:cs[i%3],life:130+Math.random()*70,rot:Math.random()*6,vr:(Math.random()-.5)*.3});
+    spawn(arr);
+  }
+  function elCenter(id){const el=document.getElementById(id);if(!el)return{x:innerWidth/2,y:innerHeight/3};const r=el.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2};}
+
+  // ── 四级反馈 ──
+  return {
+    // L1 轻：答对单步
+    correct(){SND.correct();const c=elCenter('btn-confirm');coinBurst(c.x,c.y,8);},
+    // L2 中：答错（纠正感，不惩罚）
+    wrong(){SND.wrong();if(!reduce){const m=document.querySelector('.modal');if(m){m.classList.remove('fx-shake');void m.offsetWidth;m.classList.add('fx-shake');}}},
+    // L3 强：通关
+    levelClear(){SND.levelClear();confetti();coinBurst(innerWidth/2,innerHeight*0.42,18);},
+    // L4 满：三星零失误
+    perfectClear(){SND.perfectClear();starShower();confetti(54);coinBurst(innerWidth/2,innerHeight*0.42,24);},
+    setSound,isSoundOn
+  };
+})();
+
+// 顶栏音效开关
+(function(){
+  const b=document.getElementById('tb-sound');if(!b)return;
+  const sync=()=>{b.textContent=FX.isSoundOn()?'🔊':'🔇';b.classList.toggle('off',!FX.isSoundOn());};
+  sync();
+  b.onclick=()=>{FX.setSound(!FX.isSoundOn());sync();};
+})();
+
+function tick(){
+  S.timerSec--;
+  const m=String(Math.floor(S.timerSec/60)).padStart(2,'0');
+  const s=String(S.timerSec%60).padStart(2,'0');
+  document.getElementById('mb-timer').textContent=m+':'+s;
+  if(S.timerSec<=0)clearInterval(S.timerInt);
+}
+
+function openBattle(r){
+  if(r==='hero'&&!S.done['pro'])return;
+  S.cur=r;S.step=0;S.answers={};S.filled={};S.selBlank=null;S.chosen=undefined;S.wrongs=0;S.timerSec=1500;
+  clearInterval(S.timerInt);S.timerInt=setInterval(tick,1000);
+  const b=DATA[r];
+  document.getElementById('mb-rank').textContent=b.rank;
+  document.getElementById('mb-rank').className='mb-rank '+b.mbCls;
+  document.getElementById('mb-title').textContent='攀岩对决 · '+b.rank+'关';
+  document.getElementById('mb-timer').textContent='25:00';
+  document.getElementById('victory').classList.add('hidden');
+  document.getElementById('modal-foot').classList.remove('hidden');
+  document.getElementById('q-scroll').classList.remove('hidden');
+  document.getElementById('mask').classList.add('open');
+  renderStep();
+}
+
+function closeModal(){
+  document.getElementById('mask').classList.remove('open');
+  clearInterval(S.timerInt);
+  if(VIZ&&VIZ.timer){clearInterval(VIZ.timer);VIZ.timer=null;VIZ.playing=false;}
+  if(TRACE&&TRACE.timer){clearInterval(TRACE.timer);TRACE.timer=null;TRACE.playing=false;}
+}
+
+function renderStep(){
+  if(VIZ&&VIZ.timer){clearInterval(VIZ.timer);VIZ.timer=null;VIZ.playing=false;}
+  if(TRACE&&TRACE.timer){clearInterval(TRACE.timer);TRACE.timer=null;TRACE.playing=false;}
+  const b=DATA[S.cur];const steps=b.steps;const total=steps.length;const si=S.step;const step=steps[si];
+
+  // Rail
+  let rail='';
+  for(let i=0;i<total;i++){
+    const cls=i<si?'done':i===si?'cur':'';
+    rail+=`<div class="sn"><div class="sn-c ${cls}">${i<si?'✓':(i+1)}</div><div class="sn-lbl">${steps[i].lbl}</div></div>`;
+    if(i<total-1)rail+=`<div class="sn-line ${i<si?'done':''}"></div>`;
+  }
+  document.getElementById('step-rail').innerHTML=rail;
+
+  // XP
+  const xpPct=Math.round((si/total)*100);
+  document.getElementById('ft-xp-fill').style.width=xpPct+'%';
+  document.getElementById('ft-xp-lbl').textContent='经验 '+xpPct+'%';
+
+  let html=`<div class="q-num">第 ${si+1} 步 / 共 ${total} 步</div><div style="font-size:15px;font-weight:700;margin-bottom:12px">${step.title}</div>`;
+
+  if(step.type==='concept'){
+    html+=`<div class="q-txt">${step.body}</div>`;
+    html+=`<div class="concept-box"><div class="cb-lbl">💡 核心知识点</div><div class="cb-txt">${step.concept}</div>`;
+    if(step.table){
+      html+='<table class="dp-table">';
+      step.table.forEach((row,ri)=>{html+='<tr>'+row.map(c=>ri===0?`<th>${c}</th>`:`<td>${c}</td>`).join('')+'</tr>';});
+      html+='</table>';
+    }
+    html+='</div>';
+    if(step.tip)html+=`<div class="fb fb-tip show">${step.tip}</div>`;
+  }
+
+  if(step.type==='choice'){
+    html+=`<div class="q-txt">${step.q}</div><div class="choices">`;
+    const answered=S.answers[si]!==undefined;
+    step.opts.forEach((opt,oi)=>{
+      let cls='';
+      if(answered){
+        if(oi===step.ans)cls='correct locked';
+        else if(oi===S.answers[si])cls='wrong locked';
+        else cls='locked';
+      }else if(S.chosen===oi)cls='chosen';
+      html+=`<button class="ch-btn ${cls}" onclick="selChoice(${oi})"><span class="ck">${'ABCD'[oi]}</span>${opt}</button>`;
+    });
+    html+='</div>';
+    if(answered){
+      const ok=S.answers[si]===step.ans;
+      html+=`<div class="fb ${ok?'fb-ok':'fb-err'} show">${ok?step.fb_ok:step.fb_err}</div>`;
+    }
+    html+=`<div class="fb fb-hint" id="hint-box"></div>`;
+  }
+
+  if(step.type==='fill'){
+    html+=`<div class="q-txt">${step.q}</div>`;
+    let code=step.code;
+    step.blanks.forEach((bl,bi)=>{
+      const val=S.filled[si+'-'+bi];
+      const isSel=S.selBlank===bi;
+      const answered=S.answers[si]!==undefined;
+      const isOk=answered&&S.answers[si]===true;
+      const cls='blank'+(val?' ok':'')+(isSel?' sel':'')+(answered&&!isOk&&val?' err':'');
+      code=code.replace('['+bl+']',`<span class="${cls}" id="bl-${bi}" onclick="selBlank(${bi})">${val||'&nbsp;?&nbsp;'}</span>`);
+    });
+    html+=`<div class="code-block">${code}</div>`;
+    html+=`<div class="opts-lbl">候选项（先点代码中方框，再点下面选项填入）：</div><div class="opts-pool">`;
+    step.opts.forEach((opt)=>{
+      const used=Object.values(S.filled).filter(v=>v===opt).length>=step.answers.filter(v=>v===opt).length&&step.answers.includes(opt);
+      html+=`<span class="opt ${used?'used':''}" onclick="fillBlank('${opt}')">${opt}</span>`;
+    });
+    html+='</div>';
+    if(S.answers[si]!==undefined){
+      const ok=S.answers[si]===true;
+      html+=`<div class="fb ${ok?'fb-ok':'fb-err'} show">${ok?step.fb_ok:step.fb_err}</div>`;
+    }
+    html+=`<div class="fb fb-hint" id="hint-box"></div>`;
+  }
+
+  if(step.type==='viz'){
+    if(step.body)html+=`<div class="q-txt">${step.body}</div>`;
+  }
+
+  if(step.type==='trace'){
+    if(step.body)html+=`<div class="q-txt">${step.body}</div>`;
+    html+=traceBuildHTML(step.trace);
+  }
+
+  if(step.viz) html+=vizBuildHTML(step.viz);
+
+  document.getElementById('q-content').innerHTML=html;
+  if(step.viz) mountViz(step.viz);
+  if(step.type==='trace') mountTrace(step.trace);
+  document.getElementById('q-scroll').scrollTop=0;
+  updateFoot();
+}
+
+function selChoice(oi){
+  const si=S.step;
+  if(S.answers[si]!==undefined)return;
+  S.chosen=oi;
+  document.querySelectorAll('.ch-btn').forEach((b,i)=>{b.classList.toggle('chosen',i===oi)});
+  document.getElementById('btn-confirm').disabled=false;
+}
+
+function selBlank(bi){
+  S.selBlank=bi;
+  document.querySelectorAll('.blank').forEach((el,i)=>{el.classList.toggle('sel',i===bi)});
+}
+
+function fillBlank(val){
+  const si=S.step;const step=DATA[S.cur].steps[si];
+  if(S.selBlank===null)S.selBlank=0;
+  if(S.answers[si]!==undefined)return;
+  const totalUse=step.answers.filter(v=>v===val).length;
+  const curUse=Object.values(S.filled).filter(v=>v===val).length;
+  if(curUse>=totalUse&&totalUse>0)return;
+  S.filled[si+'-'+S.selBlank]=val;
+  // advance to next empty blank
+  let next=null;
+  for(let i=S.selBlank+1;i<step.blanks.length;i++){if(!S.filled[si+'-'+i]){next=i;break;}}
+  if(next===null)for(let i=0;i<S.selBlank;i++){if(!S.filled[si+'-'+i]){next=i;break;}}
+  S.selBlank=next;
+  const allFilled=step.blanks.every((_,bi)=>S.filled[si+'-'+bi]);
+  renderStep();
+  if(S.selBlank!==null){const el=document.getElementById('bl-'+S.selBlank);if(el)el.classList.add('sel');}
+  document.getElementById('btn-confirm').disabled=!allFilled;
+}
+
+function updateFoot(){
+  const b=DATA[S.cur];const si=S.step;const step=b.steps[si];
+  const btn=document.getElementById('btn-confirm');
+  const hintBtn=document.getElementById('btn-hint');
+  if(step.type==='concept'||step.type==='viz'||step.type==='trace'){btn.textContent=si<b.steps.length-1?'下一步 →':'完成关卡 🎉';btn.disabled=false;hintBtn.classList.add('hidden');return;}
+  const answered=S.answers[si]!==undefined;
+  if(answered){
+    btn.textContent=si<b.steps.length-1?'下一步 →':'完成关卡 🎉';
+    btn.disabled=false;hintBtn.classList.add('hidden');
+  }else{
+    btn.textContent='确认答案';
+    if(step.type==='choice')btn.disabled=S.chosen===undefined;
+    else btn.disabled=!step.blanks.every((_,bi)=>S.filled[si+'-'+bi]);
+    hintBtn.classList.remove('hidden');
+  }
+}
+
+function doConfirm(){
+  const b=DATA[S.cur];const si=S.step;const step=b.steps[si];
+  if(step.type==='concept'||step.type==='viz'||step.type==='trace'){advance();return;}
+  if(step.type==='choice'){
+    if(S.answers[si]!==undefined){advance();return;}
+    S.answers[si]=S.chosen;S.chosen=undefined;
+    const correct=(S.answers[si]===step.ans);
+    if(!correct)S.wrongs++;
+    correct?FX.correct():FX.wrong();
+    renderStep();updateFoot();return;
+  }
+  if(step.type==='fill'){
+    if(S.answers[si]!==undefined){advance();return;}
+    const filled=step.blanks.map((_,bi)=>S.filled[si+'-'+bi]);
+    const ok=filled.every((v,i)=>v===step.answers[i]);
+    S.answers[si]=ok;if(!ok)S.wrongs++;
+    ok?FX.correct():FX.wrong();
+    renderStep();updateFoot();return;
+  }
+}
+
+function advance(){
+  S.step++;S.chosen=undefined;
+  if(S.step>=DATA[S.cur].steps.length)showVictory();
+  else renderStep();
+}
+
+function showHint(){
+  const step=DATA[S.cur].steps[S.step];
+  const el=document.getElementById('hint-box');
+  if(el){el.textContent='💡 提示：'+step.hint;el.classList.add('show');}
+}
+
+function showVictory(){
+  clearInterval(S.timerInt);
+  if(VIZ&&VIZ.timer){clearInterval(VIZ.timer);VIZ.timer=null;VIZ.playing=false;}
+  if(TRACE&&TRACE.timer){clearInterval(TRACE.timer);TRACE.timer=null;TRACE.playing=false;}
+  const b=DATA[S.cur];
+  const stars=S.wrongs===0?3:S.wrongs<=2?2:1;
+
+  // ── 读取历史最好成绩，判定本次是否产生奖励 ──────────────
+  const prog = loadProgress();
+  if(!prog.done[CURRENT_ID]) prog.done[CURRENT_ID]={};
+  const prevStars = prog.done[CURRENT_ID][S.cur];          // undefined = 从未通关
+  const firstClear = (prevStars === undefined);
+  const prevBest = prevStars || 0;
+  const newBest  = Math.max(prevBest, stars);
+
+  // 金币按星级缩放（3★满额 / 2★七成 / 1★四成），且只补「比历史最好多出来的部分」→ 不可刷
+  const fullCoins = b.coins||0;
+  const mult = s => s===3?1 : s===2?0.7 : s>=1?0.4 : 0;
+  const prevCoinVal = Math.round(fullCoins*mult(prevBest));
+  const newCoinVal  = Math.round(fullCoins*mult(newBest));
+  const gainCoins = Math.max(0, newCoinVal - prevCoinVal);
+  // 经验只在首次通关结算（代表“学过这一关”），重打不再发
+  const gainXp = firstClear ? (b.xp||0) : 0;
+
+  S.coins += gainCoins;
+  S.xp    += gainXp;
+  S.done[S.cur] = newBest;                                  // 只保留历史最好星级
+  prog.coins = S.coins;
+  prog.xp    = S.xp;
+  prog.done[CURRENT_ID][S.cur] = newBest;
+  saveProgress(prog);
+
+  document.getElementById('q-scroll').classList.add('hidden');
+  document.getElementById('modal-foot').classList.add('hidden');
+  const vp=document.getElementById('victory');
+  vp.classList.remove('hidden');
+
+  document.getElementById('v-title').textContent={new:'新兵关通过！',pro:'锐士关通过！',hero:'英雄关通过！'}[S.cur];
+  let sub;
+  if(firstClear) sub = stars===3?'零失误！完美通关！':stars===2?'掌握了核心思路，继续加油！':'通关了，建议再练习一遍巩固。';
+  else if(gainCoins>0) sub = '刷新最佳成绩！补发星级差额奖励 🎉';
+  else sub = '复习巩固完成 · 本次无额外奖励（已是最佳成绩）';
+  document.getElementById('v-sub').textContent=sub;
+
+  let starsH='';
+  for(let i=0;i<3;i++)starsH+=`<span class="vs ${i<stars?'lit':'dim'}" style="animation-delay:${i*.15}s">${i<stars?'★':'☆'}</span>`;
+  document.getElementById('v-stars').innerHTML=starsH;
+
+  document.getElementById('total-coins').textContent=S.coins;
+  document.getElementById('v-rwds').innerHTML=`
+    <div class="v-rwd"><div class="v-rwd-val" style="${gainCoins?'':'color:var(--text3)'}">+${gainCoins}</div><div class="v-rwd-lbl">精灵币</div></div>
+    <div class="v-rwd"><div class="v-rwd-val" style="${gainXp?'':'color:var(--text3)'}">+${gainXp}</div><div class="v-rwd-lbl">经验值</div></div>
+    <div class="v-rwd"><div class="v-rwd-val">${stars}★</div><div class="v-rwd-lbl">本次评分</div></div>
+  `;
+
+  // Update main card（按历史最好星级显示）
+  document.getElementById('sc-'+S.cur).textContent='1';
+  document.getElementById('pg-'+S.cur).style.width='100%';
+  let sh='';for(let i=0;i<3;i++)sh+=`<span class="star ${i<newBest?'s-lit':'s-dim'}">${i<newBest?'★':'☆'}</span>`;
+  document.getElementById('stars-'+S.cur).innerHTML=sh;
+  const mainBtn=document.getElementById('btn-'+S.cur);
+  if(mainBtn){mainBtn.textContent='再来一次';mainBtn.className='bc-btn bb-again';}
+
+  // 顶栏经验/金币/完成数同步
+  document.getElementById('xp-text').textContent = S.xp;
+  document.getElementById('xp-fill').style.width = Math.min(100,Math.round(S.xp/2000*100))+'%';
+  document.getElementById('done-count').textContent=Object.keys(S.done).length;
+
+  // Unlock hero after pro
+  if(S.cur==='pro'){
+    const hCard=document.getElementById('card-hero');
+    hCard.classList.remove('bc-locked');
+    const hBtn=document.getElementById('btn-hero');
+    hBtn.className='bc-btn bb-n';hBtn.style.background='var(--gold)';hBtn.style.color='#fff';
+    hBtn.disabled=false;hBtn.textContent='开始学习';hBtn.onclick=()=>openBattle('hero');
+  }
+
+  // Next button
+  const nxt=document.getElementById('v-next');
+  if(S.cur==='new'){nxt.textContent='挑战锐士 →';nxt.onclick=()=>openBattle('pro');}
+  else if(S.cur==='pro'){nxt.textContent='挑战英雄 →';nxt.onclick=()=>openBattle('hero');}
+  else{nxt.textContent='查看下一课时 →';nxt.onclick=closeModal;}
+
+  // 通关特效：三星零失误 → 满级；否则普通通关
+  if(stars===3)FX.perfectClear();else FX.levelClear();
+
+  renderSidebar(CURRENT_ID);
+}
+
+</script>
+</body>
+</html>
